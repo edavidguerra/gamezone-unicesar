@@ -65,4 +65,16 @@ public class PersonService {
         }
         return null;
     }
+        /**
+     * @param id seller id
+     * @return the seller with the given id, or null if it does not exist
+     */
+    public Seller findSellerById(String id) {
+        for (Seller seller : sellers) {
+            if (seller.getId().equals(id)) {
+                return seller;
+            }
+        }
+        return null;
+    }
 }

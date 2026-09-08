@@ -41,4 +41,10 @@ public class PersonService {
         personRepository.saveClients(clients);
         return client;
     }
+        /**
+     * @return the complete list of registered clients
+     */
+    public List<Client> listClients() {
+        return clients;
+    }
 }

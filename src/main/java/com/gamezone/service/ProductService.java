@@ -66,7 +66,7 @@ public class ProductService {
      * @param id product id
      * @return the product with the given id, or null if it does not exist
      */
-    
+
     public Product findById(String id) {
         for (Product product : products) {
             if (product.getId().equals(id)) {
@@ -74,5 +74,33 @@ public class ProductService {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks whether the product with the given id has enough stock.
+     *
+     * @param id product id
+     * @param quantity quantity requested
+     * @return true if the product exists and has enough stock
+     */
+
+    public boolean hasStock(String id, int quantity) {
+        Product product = findById(id);
+        return product != null && product.hasStock(quantity);
+    }
+
+    /**
+     * Reduces the stock of the given product and persists the change.
+     *
+     * @param id product id
+     * @param quantity quantity sold
+     */
+    
+    public void reduceStock(String id, int quantity) {
+        Product product = findById(id);
+        if (product != null) {
+            product.reduceStock(quantity);
+            productRepository.saveAll(products);
+        }
     }
 }

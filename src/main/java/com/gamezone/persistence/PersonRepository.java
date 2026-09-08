@@ -60,4 +60,20 @@ public class PersonRepository {
         }
         return clients;
     }
+        /**
+     * Saves the full list of sellers to disk, overwriting the file.
+     *
+     * @param sellers list of sellers to persist
+     */
+    public void saveSellers(List<Seller> sellers) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(SELLERS_FILE))) {
+            for (Seller seller : sellers) {
+                writer.println(seller.getId() + "|" + seller.getName() + "|"
+                        + seller.getPhone() + "|" + seller.getEmployeeCode() + "|"
+                        + seller.getShift());
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving sellers: " + e.getMessage());
+        }
+    }
 }

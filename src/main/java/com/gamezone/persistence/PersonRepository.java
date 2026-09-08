@@ -76,4 +76,29 @@ public class PersonRepository {
             System.out.println("Error saving sellers: " + e.getMessage());
         }
     }
+        /**
+     * Loads all sellers from disk.
+     *
+     * @return list of sellers loaded from disk
+     */
+    public List<Seller> loadSellers() {
+        List<Seller> sellers = new ArrayList<>();
+        File file = new File(SELLERS_FILE);
+        if (!file.exists()) {
+            return sellers;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                String[] parts = line.split("\\|");
+                sellers.add(new Seller(parts[0], parts[1], parts[2], parts[3], parts[4]));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading sellers: " + e.getMessage());
+        }
+        return sellers;
+    }
 }

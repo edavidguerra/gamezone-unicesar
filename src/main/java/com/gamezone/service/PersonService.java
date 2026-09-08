@@ -47,4 +47,10 @@ public class PersonService {
     public List<Client> listClients() {
         return clients;
     }
+        /**
+     * @return the complete list of registered sellers
+     */
+    public List<Seller> listSellers() {
+        return sellers;
+    }
 }

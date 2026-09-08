@@ -53,4 +53,16 @@ public class PersonService {
     public List<Seller> listSellers() {
         return sellers;
     }
+        /**
+     * @param id client id
+     * @return the client with the given id, or null if it does not exist
+     */
+    public Client findClientById(String id) {
+        for (Client client : clients) {
+            if (client.getId().equals(id)) {
+                return client;
+            }
+        }
+        return null;
+    }
 }

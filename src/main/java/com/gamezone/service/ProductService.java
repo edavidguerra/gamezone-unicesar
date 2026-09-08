@@ -1,5 +1,6 @@
 package com.gamezone.service;
 import com.gamezone.model.Product;
+import com.gamezone.model.VideoGame;
 import com.gamezone.persistence.ProductRepository;
 import java.util.List;
 
@@ -22,5 +23,19 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
         this.products = productRepository.loadAll();
+    }
+
+        /**
+     * Registers a new video game and persists the updated inventory.
+     *
+     * @return the registered video game
+     */
+    
+    public VideoGame registerVideoGame(String id, String title, double price, int stock,
+                                        String platform, String genre, String ageRating) {
+        VideoGame videoGame = new VideoGame(id, title, price, stock, platform, genre, ageRating);
+        products.add(videoGame);
+        productRepository.saveAll(products);
+        return videoGame;
     }
 }

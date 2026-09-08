@@ -45,12 +45,34 @@ public class ProductService {
      *
      * @return the registered console
      */
-    
+
     public Console registerConsole(String id, String title, double price, int stock,
                                     String brand, String model, String generation) {
         Console console = new Console(id, title, price, stock, brand, model, generation);
         products.add(console);
         productRepository.saveAll(products);
         return console;
+    }
+
+    /**
+     * @return the complete list of products in the inventory
+     */
+
+    public List<Product> listProducts() {
+        return products;
+    }
+
+    /**
+     * @param id product id
+     * @return the product with the given id, or null if it does not exist
+     */
+    
+    public Product findById(String id) {
+        for (Product product : products) {
+            if (product.getId().equals(id)) {
+                return product;
+            }
+        }
+        return null;
     }
 }

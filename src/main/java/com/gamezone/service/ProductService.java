@@ -1,4 +1,5 @@
 package com.gamezone.service;
+import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.VideoGame;
 import com.gamezone.persistence.ProductRepository;
@@ -30,12 +31,26 @@ public class ProductService {
      *
      * @return the registered video game
      */
-    
+
     public VideoGame registerVideoGame(String id, String title, double price, int stock,
                                         String platform, String genre, String ageRating) {
         VideoGame videoGame = new VideoGame(id, title, price, stock, platform, genre, ageRating);
         products.add(videoGame);
         productRepository.saveAll(products);
         return videoGame;
+    }
+
+    /**
+     * Registers a new console and persists the updated inventory.
+     *
+     * @return the registered console
+     */
+    
+    public Console registerConsole(String id, String title, double price, int stock,
+                                    String brand, String model, String generation) {
+        Console console = new Console(id, title, price, stock, brand, model, generation);
+        products.add(console);
+        productRepository.saveAll(products);
+        return console;
     }
 }

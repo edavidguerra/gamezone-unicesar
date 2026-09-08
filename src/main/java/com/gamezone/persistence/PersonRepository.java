@@ -35,4 +35,29 @@ public class PersonRepository {
             System.out.println("Error saving clients: " + e.getMessage());
         }
     }
+        /**
+     * Loads all clients from disk.
+     *
+     * @return list of clients loaded from disk
+     */
+    public List<Client> loadClients() {
+        List<Client> clients = new ArrayList<>();
+        File file = new File(CLIENTS_FILE);
+        if (!file.exists()) {
+            return clients;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                String[] parts = line.split("\\|");
+                clients.add(new Client(parts[0], parts[1], parts[2], parts[3]));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading clients: " + e.getMessage());
+        }
+        return clients;
+    }
 }

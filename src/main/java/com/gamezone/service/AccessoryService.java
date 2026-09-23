@@ -125,4 +125,46 @@ public class AccessoryService {
         }
         return null;
     }
+
+    /**
+     * Checks whether an accessory exists and has enough units available.
+     *
+     * @param id accessory id
+     * @param quantity quantity requested
+     * @return true if the accessory exists and has enough stock
+     */
+    public boolean hasStock(String id, int quantity) {
+        Accessory accessory = findById(id);
+        return accessory != null && accessory.hasStock(quantity);
+    }
+
+    /**
+     * Decreases the stock of an accessory, used when a sale consumes it,
+     * and persists the updated list.
+     *
+     * @param accessoryId accessory id
+     * @param quantity quantity to subtract
+     */
+    public void updateStock(String accessoryId, int quantity) {
+        Accessory accessory = findById(accessoryId);
+        if (accessory != null) {
+            accessory.reduceStock(quantity);
+            repository.saveAll(accessories);
+        }
+    }
+
+    /**
+     * Increases the stock of an accessory, used when a return brings it
+     * back into inventory, and persists the updated list.
+     *
+     * @param accessoryId accessory id
+     * @param quantity quantity to add back
+     */
+    public void restoreStock(String accessoryId, int quantity) {
+        Accessory accessory = findById(accessoryId);
+        if (accessory != null) {
+            accessory.setStock(accessory.getStock() + quantity);
+            repository.saveAll(accessories);
+        }
+    }
 }

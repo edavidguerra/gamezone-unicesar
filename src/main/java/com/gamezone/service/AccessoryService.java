@@ -5,6 +5,7 @@ import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
 import com.gamezone.model.Memory;
 import com.gamezone.persistence.AccessoryRepository;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,5 +83,46 @@ public class AccessoryService {
         accessories.add(memory);
         repository.saveAll(accessories);
         return memory;
+    }
+
+    /**
+     * Returns every registered accessory.
+     *
+     * @return the complete list of accessories
+     */
+    public List<Accessory> listAllAccessories() {
+        return accessories;
+    }
+
+    /**
+     * Returns the accessories that declare compatibility with the given
+     * console.
+     *
+     * @param consoleId id of the console to check
+     * @return list of accessories compatible with that console
+     */
+    public List<Accessory> findAccessoriesCompatibleWith(String consoleId) {
+        List<Accessory> result = new ArrayList<>();
+        for (Accessory accessory : accessories) {
+            if (accessory.isCompatibleWith(consoleId)) {
+                result.add(accessory);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Finds an accessory by its id.
+     *
+     * @param id accessory id
+     * @return the accessory with the given id, or null if it does not exist
+     */
+    public Accessory findById(String id) {
+        for (Accessory accessory : accessories) {
+            if (accessory.getId().equals(id)) {
+                return accessory;
+            }
+        }
+        return null;
     }
 }

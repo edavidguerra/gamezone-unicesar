@@ -24,13 +24,15 @@ public class ConsoleMenu {
     private ProductService productService;
     private PersonService personService;
     private SaleService saleService;
+    private AccessoryService accessoryService;
     private Scanner scanner;
 
     public ConsoleMenu(ProductService productService, PersonService personService,
-                        SaleService saleService) {
+                        SaleService saleService, AccessoryService accessoryService) {
         this.productService = productService;
         this.personService = personService;
         this.saleService = saleService;
+        this.accessoryService = accessoryService;
         this.scanner = new Scanner(System.in);
     }
 
@@ -41,6 +43,7 @@ public class ConsoleMenu {
             System.out.println("1. Products menu");
             System.out.println("2. People menu");
             System.out.println("3. Sales menu");
+            System.out.println("4. Accessories menu");
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
             option = readInt();
@@ -48,6 +51,7 @@ public class ConsoleMenu {
                 case 1 -> productsMenu();
                 case 2 -> peopleMenu();
                 case 3 -> salesMenu();
+                case 4 -> accessoriesMenu();
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid option.");
             }
@@ -159,7 +163,13 @@ public class ConsoleMenu {
             System.out.print("Product id #" + (i + 1) + ": ");
             productIds.add(scanner.nextLine());
         }
-        Sale sale = saleService.registerSale(id, clientId, sellerId, productIds);
+        System.out.print("How many accessories? "); int accessoryCount = Integer.parseInt(scanner.nextLine());
+        List<String> accessoryIds = new ArrayList<>();
+        for (int i = 0; i < accessoryCount; i++) {
+            System.out.print("Accessory id #" + (i + 1) + ": ");
+            accessoryIds.add(scanner.nextLine());
+        }
+        Sale sale = saleService.registerSale(id, clientId, sellerId, productIds, accessoryIds);
         System.out.println("Sale registered. Total: " + sale.calculateTotal());
     }
 
@@ -167,6 +177,88 @@ public class ConsoleMenu {
         for (Sale sale : sales) {
             System.out.println(sale.getDate() + " | " + sale.getClient().getName()
                     + " | " + sale.getSeller().getName() + " | Total: " + sale.calculateTotal());
+        }
+    }
+
+    private void accessoriesMenu() {
+        System.out.println("\n-- Accessories --");
+        System.out.println("1. Register a new controller");
+        System.out.println("2. Register a new cable");
+        System.out.println("3. Register a new memory");
+        System.out.println("4. List all accessories");
+        System.out.println("5. List accessories by type");
+        System.out.println("6. Find accessories compatible with a console");
+        System.out.println("0. Back");
+        switch (readInt()) {
+            case 1 -> registerControllerFlow();
+            case 2 -> registerCableFlow();
+            case 3 -> registerMemoryFlow();
+            case 4 -> listAllAccessoriesFlow();
+            case 5 -> listAccessoriesByTypeFlow();
+            case 6 -> listCompatibleAccessoriesFlow();
+            case 0 -> { /* back */ }
+            default -> System.out.println("Invalid option.");
+        }
+    }
+
+    private void registerControllerFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Title: "); String title = scanner.nextLine();
+        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
+        System.out.print("Connection type: "); String connectionType = scanner.nextLine();
+        Controller controller = accessoryService.registerController(id, title, price, stock, connectionType);
+        System.out.println("Registered: " + controller.getDescription());
+    }
+
+    private void registerCableFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Title: "); String title = scanner.nextLine();
+        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
+        System.out.print("Length in meters: "); double lengthInMeters = Double.parseDouble(scanner.nextLine());
+        System.out.print("Connector type: "); String connectorType = scanner.nextLine();
+        Cable cable = accessoryService.registerCable(id, title, price, stock, lengthInMeters, connectorType);
+        System.out.println("Registered: " + cable.getDescription());
+    }
+
+    private void registerMemoryFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Title: "); String title = scanner.nextLine();
+        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
+        System.out.print("Capacity in gigabytes: "); int capacityInGigabytes = Integer.parseInt(scanner.nextLine());
+        System.out.print("Memory type: "); String memoryType = scanner.nextLine();
+        Memory memory = accessoryService.registerMemory(id, title, price, stock, capacityInGigabytes, memoryType);
+        System.out.println("Registered: " + memory.getDescription());
+    }
+
+    private void listAllAccessoriesFlow() {
+        for (Accessory accessory : accessoryService.listAllAccessories()) {
+            System.out.println(accessory.getDescription());
+        }
+    }
+
+    private void listAccessoriesByTypeFlow() {
+        System.out.print("Type (CONTROLLER, CABLE, MEMORY): ");
+        String type = scanner.nextLine().toUpperCase();
+        for (Accessory accessory : accessoryService.listAllAccessories()) {
+            boolean matches = switch (type) {
+                case "CONTROLLER" -> accessory instanceof Controller;
+                case "CABLE" -> accessory instanceof Cable;
+                case "MEMORY" -> accessory instanceof Memory;
+                default -> false;
+            };
+            if (matches) {
+                System.out.println(accessory.getDescription());
+            }
+        }
+    }
+
+    private void listCompatibleAccessoriesFlow() {
+        System.out.print("Console id: "); String consoleId = scanner.nextLine();
+        for (Accessory accessory : accessoryService.findAccessoriesCompatibleWith(consoleId)) {
+            System.out.println(accessory.getDescription());
         }
     }
 

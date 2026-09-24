@@ -1,11 +1,16 @@
 package com.gamezone.ui;
 
+import com.gamezone.model.Accessory;
+import com.gamezone.model.Cable;
 import com.gamezone.model.Client;
 import com.gamezone.model.Console;
+import com.gamezone.model.Controller;
+import com.gamezone.model.Memory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Seller;
 import com.gamezone.model.VideoGame;
+import com.gamezone.service.AccessoryService;
 import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;

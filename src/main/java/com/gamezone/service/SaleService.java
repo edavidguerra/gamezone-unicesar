@@ -19,39 +19,61 @@ public class SaleService {
     private SaleRepository saleRepository;
     private ProductService productService;
     private PersonService personService;
+    private AccessoryService accessoryService;
     private List<Sale> sales;
 
     public SaleService(SaleRepository saleRepository, ProductService productService,
-                        PersonService personService) {
+                        PersonService personService, AccessoryService accessoryService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
+        this.accessoryService = accessoryService;
         this.sales = saleRepository.loadAll(
                 personService.listClients(),
                 personService.listSellers(),
                 productService.listProducts());
     }
 
-    public Sale registerSale(String id, String clientId, String sellerId, List<String> productIds) {
+    public Sale registerSale(String id, String clientId, String sellerId,
+                              List<String> productIds, List<String> accessoryIds) {
         Client client = personService.findClientById(clientId);
         Seller seller = personService.findSellerById(sellerId);
 
         if (client == null || seller == null) {
             throw new IllegalArgumentException("Client or seller not found.");
         }
-        if (productIds == null || productIds.isEmpty()) {
+        boolean noProducts = productIds == null || productIds.isEmpty();
+        boolean noAccessories = accessoryIds == null || accessoryIds.isEmpty();
+        if (noProducts && noAccessories) {
             throw new IllegalArgumentException("A sale must contain at least one product.");
         }
-        for (String productId : productIds) {
-            if (!productService.hasStock(productId, 1)) {
-                throw new IllegalStateException("Insufficient stock for product: " + productId);
+        if (productIds != null) {
+            for (String productId : productIds) {
+                if (!productService.hasStock(productId, 1)) {
+                    throw new IllegalStateException("Insufficient stock for product: " + productId);
+                }
+            }
+        }
+        if (accessoryIds != null) {
+            for (String accessoryId : accessoryIds) {
+                if (!accessoryService.hasStock(accessoryId, 1)) {
+                    throw new IllegalStateException("Insufficient stock for accessory: " + accessoryId);
+                }
             }
         }
 
         List<Product> soldProducts = new ArrayList<>();
-        for (String productId : productIds) {
-            soldProducts.add(productService.findById(productId));
-            productService.reduceStock(productId, 1);
+        if (productIds != null) {
+            for (String productId : productIds) {
+                soldProducts.add(productService.findById(productId));
+                productService.reduceStock(productId, 1);
+            }
+        }
+        if (accessoryIds != null) {
+            for (String accessoryId : accessoryIds) {
+                soldProducts.add(accessoryService.findById(accessoryId));
+                accessoryService.updateStock(accessoryId, 1);
+            }
         }
 
         Sale sale = new Sale(id, LocalDate.now().toString(), client, seller, soldProducts);

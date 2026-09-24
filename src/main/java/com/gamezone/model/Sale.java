@@ -13,6 +13,8 @@ public class Sale {
     private Client client;
     private Seller seller;
     private List<Product> products;
+    private String appliedPromotionName;
+    private double discountAmount;
 
     /**
      * Creates a new sale.
@@ -32,6 +34,7 @@ public class Sale {
         this.client = client;
         this.seller = seller;
         this.products = products;
+        this.discountAmount = 0.0;
     }
 
     public String getId() { return id; }
@@ -49,6 +52,12 @@ public class Sale {
     public List<Product> getProducts() { return products; }
     public void setProducts(List<Product> products) { this.products = products; }
 
+    public String getAppliedPromotionName() { return appliedPromotionName; }
+    public void setAppliedPromotionName(String appliedPromotionName) { this.appliedPromotionName = appliedPromotionName; }
+
+    public double getDiscountAmount() { return discountAmount; }
+    public void setDiscountAmount(double discountAmount) { this.discountAmount = discountAmount; }
+
     /**
      * Calculates the total of the sale by summing the price of every
      * product sold.
@@ -61,5 +70,24 @@ public class Sale {
             total += product.getPrice();
         }
         return total;
+    }
+
+    /**
+     * Builds a human-readable receipt in Spanish showing the subtotal, the
+     * applied promotion (if any) and the final total after discount.
+     */
+    
+    public String generateReceipt() {
+        double subtotal = calculateTotal();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Recibo de venta ").append(getId()).append("\n");
+        sb.append("Subtotal: ").append(subtotal).append("\n");
+        if (discountAmount > 0) {
+            sb.append("Promocion aplicada: ").append(appliedPromotionName)
+              .append(" (").append(discountAmount).append(")\n");
+        }
+        double total = subtotal - discountAmount;
+        sb.append("Total a pagar: ").append(total);
+        return sb.toString();
     }
 }

@@ -12,6 +12,8 @@ Proyecto académico — Taller 1 de Programación III, Universidad Popular del C
 - Registro de ventas asociadas a un cliente, un vendedor y uno o más productos.
 - Cálculo automático del total de cada venta.
 - Consulta de ventas por cliente y por vendedor.
+- Registro y consulta de accesorios (controles, cables y memorias), incluyendo su
+  compatibilidad con consolas específicas.
 - Persistencia de todos los datos en archivos de texto dentro de la carpeta `data/`.
 
 ## Requirements

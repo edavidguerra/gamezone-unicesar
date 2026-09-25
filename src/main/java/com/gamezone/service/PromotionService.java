@@ -31,9 +31,10 @@ public class PromotionService {
 
     public CategoryDiscount registerCategoryDiscount(String id, String name,
             LocalDate startDate, LocalDate endDate, double percentage, String targetCategory) {
-        if (!targetCategory.equals("VIDEOGAME") && !targetCategory.equals("CONSOLE")) {
-            throw new IllegalArgumentException("Categoria de descuento no valida: " + targetCategory);
-        }
+       if (!targetCategory.equals("VIDEOGAME") && !targetCategory.equals("CONSOLE")
+        && !targetCategory.equals("ACCESSORY")) {
+    throw new IllegalArgumentException("Categoria de descuento no valida: " + targetCategory);
+}
         CategoryDiscount promo = new CategoryDiscount(id, name, startDate, endDate,
                 percentage, targetCategory);
         promotions.add(promo);

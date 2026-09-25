@@ -14,6 +14,8 @@ Proyecto académico — Taller 1 de Programación III, Universidad Popular del C
 - Consulta de ventas por cliente y por vendedor.
 - Registro y consulta de accesorios (controles, cables y memorias), incluyendo su
   compatibilidad con consolas específicas.
+- Registro de promociones (porcentaje, por categoría o por volumen de compra) y aplicación
+  automática de la mejor promoción vigente al registrar una venta.
 - Persistencia de todos los datos en archivos de texto dentro de la carpeta `data/`.
 
 ## Requirements

@@ -1,20 +1,26 @@
 package com.gamezone.ui;
 
 import com.gamezone.model.Accessory;
+import com.gamezone.model.BulkPurchaseDiscount;
 import com.gamezone.model.Cable;
+import com.gamezone.model.CategoryDiscount;
 import com.gamezone.model.Client;
 import com.gamezone.model.Console;
 import com.gamezone.model.Controller;
 import com.gamezone.model.Memory;
+import com.gamezone.model.PercentageDiscount;
 import com.gamezone.model.Product;
+import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Seller;
 import com.gamezone.model.VideoGame;
 import com.gamezone.service.AccessoryService;
 import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
+import com.gamezone.service.PromotionService;
 import com.gamezone.service.SaleService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -30,14 +36,17 @@ public class ConsoleMenu {
     private PersonService personService;
     private SaleService saleService;
     private AccessoryService accessoryService;
+    private PromotionService promotionService;
     private Scanner scanner;
 
     public ConsoleMenu(ProductService productService, PersonService personService,
-                        SaleService saleService, AccessoryService accessoryService) {
+                        SaleService saleService, AccessoryService accessoryService,
+                        PromotionService promotionService) {
         this.productService = productService;
         this.personService = personService;
         this.saleService = saleService;
         this.accessoryService = accessoryService;
+        this.promotionService = promotionService;
         this.scanner = new Scanner(System.in);
     }
 
@@ -49,6 +58,7 @@ public class ConsoleMenu {
             System.out.println("2. People menu");
             System.out.println("3. Sales menu");
             System.out.println("4. Accessories menu");
+            System.out.println("5. Promotions menu");
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
             option = readInt();
@@ -57,6 +67,7 @@ public class ConsoleMenu {
                 case 2 -> peopleMenu();
                 case 3 -> salesMenu();
                 case 4 -> accessoriesMenu();
+                case 5 -> promotionsMenu();
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid option.");
             }
@@ -175,7 +186,7 @@ public class ConsoleMenu {
             accessoryIds.add(scanner.nextLine());
         }
         Sale sale = saleService.registerSale(id, clientId, sellerId, productIds, accessoryIds);
-        System.out.println("Sale registered. Total: " + sale.calculateTotal());
+        System.out.println(sale.generateReceipt());
     }
 
     private void printSales(List<Sale> sales) {
@@ -264,6 +275,69 @@ public class ConsoleMenu {
         System.out.print("Console id: "); String consoleId = scanner.nextLine();
         for (Accessory accessory : accessoryService.findAccessoriesCompatibleWith(consoleId)) {
             System.out.println(accessory.getDescription());
+        }
+    }
+
+    private void promotionsMenu() {
+        System.out.println("\n-- Promotions --");
+        System.out.println("1. Register a percentage discount");
+        System.out.println("2. Register a category discount");
+        System.out.println("3. Register a bulk purchase discount");
+        System.out.println("4. List all promotions");
+        System.out.println("5. List active promotions");
+        System.out.println("0. Back");
+        switch (readInt()) {
+            case 1 -> registerPercentageDiscountFlow();
+            case 2 -> registerCategoryDiscountFlow();
+            case 3 -> registerBulkPurchaseDiscountFlow();
+            case 4 -> listAllPromotionsFlow();
+            case 5 -> listActivePromotionsFlow();
+            case 0 -> { /* back */ }
+            default -> System.out.println("Invalid option.");
+        }
+    }
+
+    private void registerPercentageDiscountFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Name: "); String name = scanner.nextLine();
+        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
+        PercentageDiscount promo = promotionService.registerPercentageDiscount(id, name, startDate, endDate, percentage);
+        System.out.println("Registered: " + promo.getName());
+    }
+
+    private void registerCategoryDiscountFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Name: "); String name = scanner.nextLine();
+        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
+        System.out.print("Target category (VIDEOGAME, CONSOLE): "); String targetCategory = scanner.nextLine().toUpperCase();
+        CategoryDiscount promo = promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
+        System.out.println("Registered: " + promo.getName());
+    }
+
+    private void registerBulkPurchaseDiscountFlow() {
+        System.out.print("Id: "); String id = scanner.nextLine();
+        System.out.print("Name: "); String name = scanner.nextLine();
+        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Minimum quantity: "); int minimumQuantity = Integer.parseInt(scanner.nextLine());
+        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
+        BulkPurchaseDiscount promo = promotionService.registerBulkPurchaseDiscount(id, name, startDate, endDate, minimumQuantity, percentage);
+        System.out.println("Registered: " + promo.getName());
+    }
+
+    private void listAllPromotionsFlow() {
+        for (Promotion promotion : promotionService.listAllPromotions()) {
+            System.out.println(promotion.getName());
+        }
+    }
+
+    private void listActivePromotionsFlow() {
+        for (Promotion promotion : promotionService.listActivePromotions()) {
+            System.out.println(promotion.getName());
         }
     }
 

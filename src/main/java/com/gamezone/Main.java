@@ -32,7 +32,7 @@ public class Main {
         SaleService saleService = new SaleService(saleRepository, productService,
                 personService, accessoryService, promotionService);
 
-        ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService, accessoryService);
+        ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService, accessoryService, promotionService);
         menu.start();
     }
 }

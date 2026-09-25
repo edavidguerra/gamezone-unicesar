@@ -2,6 +2,7 @@ package com.gamezone.service;
 
 import com.gamezone.model.Client;
 import com.gamezone.model.Product;
+import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Seller;
 import com.gamezone.persistence.SaleRepository;
@@ -20,14 +21,17 @@ public class SaleService {
     private ProductService productService;
     private PersonService personService;
     private AccessoryService accessoryService;
+    private PromotionService promotionService;
     private List<Sale> sales;
 
     public SaleService(SaleRepository saleRepository, ProductService productService,
-                        PersonService personService, AccessoryService accessoryService) {
+                        PersonService personService, AccessoryService accessoryService,
+                        PromotionService promotionService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accessoryService = accessoryService;
+        this.promotionService = promotionService;
         this.sales = saleRepository.loadAll(
                 personService.listClients(),
                 personService.listSellers(),
@@ -77,6 +81,14 @@ public class SaleService {
         }
 
         Sale sale = new Sale(id, LocalDate.now().toString(), client, seller, soldProducts);
+
+        Promotion bestPromotion = promotionService.findBestPromotionFor(sale);
+        if (bestPromotion != null) {
+            double discount = bestPromotion.calculateDiscount(sale);
+            sale.setAppliedPromotionName(bestPromotion.getName());
+            sale.setDiscountAmount(discount);
+        }
+
         sales.add(sale);
         saleRepository.saveAll(sales);
         return sale;

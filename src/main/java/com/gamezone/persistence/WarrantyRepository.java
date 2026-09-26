@@ -1,30 +1,27 @@
 package com.gamezone.persistence;
 
-import com.gamezone.model.*;
-import com.gamezone.service.ProductService;
-import com.gamezone.service.SaleService;
+import com.gamezone.model.BasicWarranty;
+import com.gamezone.model.Warranty;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Reads and writes Warranty objects to a pipe-delimited text file.
- * NOTE: this initial version resolves the associated Sale through
- * SaleService, which creates a circular dependency between SaleService
- * and WarrantyRepository. This is corrected in ajuste A2.
+ * Reads and writes Warranty records as plain ids (no longer resolving
+ * Sale or Product references itself). This removes the circular
+ * dependency with SaleService; reference resolution now happens in
+ * WarrantyService.
  */
 public class WarrantyRepository {
 
     private static final String FILE_PATH = "data/warranties.csv";
 
-    private final SaleService saleService;
-    private final ProductService productService;
-
-    public WarrantyRepository(SaleService saleService, ProductService productService) {
-        this.saleService = saleService;
-        this.productService = productService;
+    /**
+     * Simple record-like holder for a raw, unresolved warranty line.
+     */
+    public static class WarrantyRecord {
+        public String type, id, productId, saleId, startDate;
     }
 
     public void saveAll(List<Warranty> warranties) {
@@ -40,31 +37,28 @@ public class WarrantyRepository {
         }
     }
 
-    public List<Warranty> loadAll() {
-        List<Warranty> warranties = new ArrayList<>();
+    public List<WarrantyRecord> loadRawRecords() {
+        List<WarrantyRecord> records = new ArrayList<>();
         File file = new File(FILE_PATH);
         if (!file.exists()) {
-            return warranties;
+            return records;
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
                 String[] parts = line.split("\\|", -1);
-                String type = parts[0];
-                String id = parts[1];
-                Product product = productService.findById(parts[2]);
-                Sale sale = saleService.findById(parts[3]);
-                LocalDate startDate = LocalDate.parse(parts[4]);
-
-                Warranty warranty = type.equals("BASIC")
-                        ? new BasicWarranty(id, product, sale, startDate)
-                        : new ExtendedWarranty(id, product, sale, startDate);
-                warranties.add(warranty);
+                WarrantyRecord record = new WarrantyRecord();
+                record.type = parts[0];
+                record.id = parts[1];
+                record.productId = parts[2];
+                record.saleId = parts[3];
+                record.startDate = parts[4];
+                records.add(record);
             }
         } catch (IOException e) {
             System.out.println("Error al leer garantias: " + e.getMessage());
         }
-        return warranties;
+        return records;
     }
 }

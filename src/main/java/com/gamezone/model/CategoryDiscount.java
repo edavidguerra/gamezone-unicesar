@@ -2,8 +2,7 @@ package com.gamezone.model;
 
 /**
  * Applies a percentage discount only over the products of a target
- * category within the sale (for example only video games, or only
- * consoles).
+ * category within the sale (for example video games, consoles, or accessories).
  */
 
 public class CategoryDiscount extends Promotion {
@@ -41,6 +40,9 @@ public class CategoryDiscount extends Promotion {
         }
         if ("CONSOLE".equals(targetCategory)) {
             return product instanceof Console;
+        }
+        if ("ACCESSORY".equals(targetCategory)) {
+            return product instanceof Accessory;
         }
         return false;
     }

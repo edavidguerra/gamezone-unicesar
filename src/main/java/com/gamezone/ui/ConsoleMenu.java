@@ -181,9 +181,18 @@ public class ConsoleMenu {
         System.out.print("Seller id: "); String sellerId = scanner.nextLine();
         System.out.print("How many products? "); int count = Integer.parseInt(scanner.nextLine());
         List<String> productIds = new ArrayList<>();
+        List<String> productIdsWithExtendedWarranty = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             System.out.print("Product id #" + (i + 1) + ": ");
-            productIds.add(scanner.nextLine());
+            String productId = scanner.nextLine();
+            productIds.add(productId);
+            Product product = productService.findById(productId);
+            if (product instanceof Console) {
+                System.out.print("Extended warranty for " + product.getTitle() + "? (y/n): ");
+                if (scanner.nextLine().equalsIgnoreCase("y")) {
+                    productIdsWithExtendedWarranty.add(productId);
+                }
+            }
         }
         System.out.print("How many accessories? "); int accessoryCount = Integer.parseInt(scanner.nextLine());
         List<String> accessoryIds = new ArrayList<>();
@@ -191,7 +200,8 @@ public class ConsoleMenu {
             System.out.print("Accessory id #" + (i + 1) + ": ");
             accessoryIds.add(scanner.nextLine());
         }
-        Sale sale = saleService.registerSale(id, clientId, sellerId, productIds, accessoryIds);
+        Sale sale = saleService.registerSale(id, clientId, sellerId, productIds, accessoryIds,
+                productIdsWithExtendedWarranty);
         System.out.println(sale.generateReceipt());
     }
 

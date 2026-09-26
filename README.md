@@ -16,6 +16,8 @@ Proyecto académico — Taller 1 de Programación III, Universidad Popular del C
   compatibilidad con consolas específicas.
 - Registro de promociones (porcentaje, por categoría o por volumen de compra) y aplicación
   automática de la mejor promoción vigente al registrar una venta.
+- Asignación automática de garantía básica a cada consola vendida, con opción de garantía
+  extendida, y consulta de garantías activas o próximas a vencer.
 - Persistencia de todos los datos en archivos de texto dentro de la carpeta `data/`.
 
 ## Requirements

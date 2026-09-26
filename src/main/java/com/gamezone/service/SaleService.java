@@ -1,6 +1,7 @@
 package com.gamezone.service;
 
 import com.gamezone.model.Client;
+import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
@@ -22,6 +23,7 @@ public class SaleService {
     private PersonService personService;
     private AccessoryService accessoryService;
     private PromotionService promotionService;
+    private WarrantyService warrantyService;
     private List<Sale> sales;
 
     public SaleService(SaleRepository saleRepository, ProductService productService,
@@ -38,8 +40,13 @@ public class SaleService {
                 productService.listProducts());
     }
 
+    public void setWarrantyService(WarrantyService warrantyService) {
+        this.warrantyService = warrantyService;
+    }
+
     public Sale registerSale(String id, String clientId, String sellerId,
-                              List<String> productIds, List<String> accessoryIds) {
+                              List<String> productIds, List<String> accessoryIds,
+                              List<String> productIdsWithExtendedWarranty) {
         Client client = personService.findClientById(clientId);
         Seller seller = personService.findSellerById(sellerId);
 
@@ -89,6 +96,16 @@ public class SaleService {
             sale.setDiscountAmount(discount);
         }
 
+        for (Product item : soldProducts) {
+            if (item instanceof Console) {
+                warrantyService.assignBasicWarranty(item, sale, LocalDate.now());
+                if (productIdsWithExtendedWarranty != null
+                        && productIdsWithExtendedWarranty.contains(item.getId())) {
+                    warrantyService.assignExtendedWarranty(item, sale, LocalDate.now());
+                }
+            }
+        }
+
         sales.add(sale);
         saleRepository.saveAll(sales);
         return sale;
@@ -116,5 +133,14 @@ public class SaleService {
             }
         }
         return result;
+    }
+
+    public Sale findById(String id) {
+        for (Sale sale : sales) {
+            if (sale.getId().equals(id)) {
+                return sale;
+            }
+        }
+        return null;
     }
 }

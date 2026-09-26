@@ -2,24 +2,46 @@ package com.gamezone.service;
 
 import com.gamezone.model.*;
 import com.gamezone.persistence.WarrantyRepository;
+import com.gamezone.persistence.WarrantyRepository.WarrantyRecord;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Coordinates warranty assignment and queries. A basic warranty is
- * assigned automatically to every console sold; an extended warranty is
- * assigned only when the customer requests and pays for it.
+ * Coordinates warranty assignment and queries. Now receives
+ * WarrantyRepository, SaleService and ProductService directly, and is
+ * responsible for resolving the raw records loaded from disk into real
+ * Warranty objects, instead of delegating that to the repository.
  */
 public class WarrantyService {
 
     private final WarrantyRepository repository;
+    private final SaleService saleService;
+    private final ProductService productService;
     private List<Warranty> warranties;
 
-    public WarrantyService(WarrantyRepository repository) {
+    public WarrantyService(WarrantyRepository repository, SaleService saleService,
+            ProductService productService) {
         this.repository = repository;
-        this.warranties = repository.loadAll();
+        this.saleService = saleService;
+        this.productService = productService;
+        this.warranties = resolveRecords(repository.loadRawRecords());
+    }
+
+    private List<Warranty> resolveRecords(List<WarrantyRecord> records) {
+        List<Warranty> resolved = new ArrayList<>();
+        for (WarrantyRecord record : records) {
+            Product product = productService.findById(record.productId);
+            Sale sale = saleService.findById(record.saleId);
+            LocalDate startDate = LocalDate.parse(record.startDate);
+
+            Warranty warranty = record.type.equals("BASIC")
+                    ? new BasicWarranty(record.id, product, sale, startDate)
+                    : new ExtendedWarranty(record.id, product, sale, startDate);
+            resolved.add(warranty);
+        }
+        return resolved;
     }
 
     public BasicWarranty assignBasicWarranty(Product product, Sale sale, LocalDate startDate) {

@@ -38,7 +38,7 @@ public class SaleService {
                 productService.listProducts());
     }
 
-    public Sale registerSale(String id, String clientId, String sellerId,
+     registerSale(String id, String clientId, String sellerId,
                               List<String> productIds, List<String> accessoryIds) {
         Client client = personService.findClientById(clientId);
         Seller seller = personService.findSellerById(sellerId);
@@ -56,7 +56,7 @@ public class SaleService {
                 if (!productService.hasStock(productId, 1)) {
                     throw new IllegalStateException("Insufficient stock for product: " + productId);
                 }
-            }
+            }public Sale
         }
         if (accessoryIds != null) {
             for (String accessoryId : accessoryIds) {
@@ -117,4 +117,13 @@ public class SaleService {
         }
         return result;
     }
+    
+       public Sale findById(String id) {
+           for (Sale sale : sales) {
+               if (sale.getId().equals(id)) {
+                   return sale;
+               }
+           }
+           return null;
+       }
 }

@@ -15,6 +15,8 @@ public class Sale {
     private List<Product> products;
     private String appliedPromotionName;
     private double discountAmount;
+    private double extendedWarrantyCost;
+    private double finalTotal;
 
     /**
      * Creates a new sale.
@@ -58,6 +60,12 @@ public class Sale {
     public double getDiscountAmount() { return discountAmount; }
     public void setDiscountAmount(double discountAmount) { this.discountAmount = discountAmount; }
 
+    public double getExtendedWarrantyCost() { return extendedWarrantyCost; }
+    public void setExtendedWarrantyCost(double extendedWarrantyCost) { this.extendedWarrantyCost = extendedWarrantyCost; }
+
+    public double getFinalTotal() { return finalTotal; }
+    public void setFinalTotal(double finalTotal) { this.finalTotal = finalTotal; }
+
     /**
      * Calculates the total of the sale by summing the price of every
      * product sold.
@@ -74,9 +82,9 @@ public class Sale {
 
     /**
      * Builds a human-readable receipt in Spanish showing the subtotal, the
-     * applied promotion (if any) and the final total after discount.
+     * applied promotion (if any), the extended warranty surcharge (if any)
+     * and the final total to pay.
      */
-    
     public String generateReceipt() {
         double subtotal = calculateTotal();
         StringBuilder sb = new StringBuilder();
@@ -84,10 +92,12 @@ public class Sale {
         sb.append("Subtotal: ").append(subtotal).append("\n");
         if (discountAmount > 0) {
             sb.append("Promocion aplicada: ").append(appliedPromotionName)
-              .append(" (").append(discountAmount).append(")\n");
+              .append(" (-").append(discountAmount).append(")\n");
         }
-        double total = subtotal - discountAmount;
-        sb.append("Total a pagar: ").append(total);
+        if (extendedWarrantyCost > 0) {
+            sb.append("Garantia extendida: +").append(extendedWarrantyCost).append("\n");
+        }
+        sb.append("Total a pagar: ").append(finalTotal);
         return sb.toString();
     }
 }

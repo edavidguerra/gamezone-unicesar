@@ -2,6 +2,7 @@ package com.gamezone.service;
 
 import com.gamezone.model.Client;
 import com.gamezone.model.Console;
+import com.gamezone.model.ExtendedWarranty;
 import com.gamezone.model.Product;
 import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
@@ -77,32 +78,50 @@ public class SaleService {
         if (productIds != null) {
             for (String productId : productIds) {
                 soldProducts.add(productService.findById(productId));
-                productService.reduceStock(productId, 1);
             }
         }
         if (accessoryIds != null) {
             for (String accessoryId : accessoryIds) {
                 soldProducts.add(accessoryService.findById(accessoryId));
-                accessoryService.updateStock(accessoryId, 1);
             }
         }
 
         Sale sale = new Sale(id, LocalDate.now().toString(), client, seller, soldProducts);
+        double subtotal = sale.calculateTotal();
 
         Promotion bestPromotion = promotionService.findBestPromotionFor(sale);
+        double discount = 0.0;
         if (bestPromotion != null) {
-            double discount = bestPromotion.calculateDiscount(sale);
+            discount = bestPromotion.calculateDiscount(sale);
             sale.setAppliedPromotionName(bestPromotion.getName());
             sale.setDiscountAmount(discount);
         }
 
+        double warrantyCost = 0.0;
         for (Product item : soldProducts) {
             if (item instanceof Console) {
                 warrantyService.assignBasicWarranty(item, sale, LocalDate.now());
                 if (productIdsWithExtendedWarranty != null
                         && productIdsWithExtendedWarranty.contains(item.getId())) {
-                    warrantyService.assignExtendedWarranty(item, sale, LocalDate.now());
+                    ExtendedWarranty extended = warrantyService.assignExtendedWarranty(
+                            item, sale, LocalDate.now());
+                    warrantyCost += extended.getAdditionalCost();
                 }
+            }
+        }
+
+        double finalTotal = subtotal - discount + warrantyCost;
+        sale.setExtendedWarrantyCost(warrantyCost);
+        sale.setFinalTotal(finalTotal);
+
+        if (productIds != null) {
+            for (String productId : productIds) {
+                productService.reduceStock(productId, 1);
+            }
+        }
+        if (accessoryIds != null) {
+            for (String accessoryId : accessoryIds) {
+                accessoryService.updateStock(accessoryId, 1);
             }
         }
 

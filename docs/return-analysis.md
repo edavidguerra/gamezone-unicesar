@@ -33,3 +33,15 @@ If the system relies solely on stale persisted amounts, any subsequent changes t
 ### 5. Which two other services does `ReturnService` need to coordinate with to restore inventory correctly?
 **Answer:** 
 `ReturnService` must coordinate with `ProductService` (to update inventory stock for video games and consoles) and `AccessoryService` (to restore stock for returned accessory products after adjustment A4).
+
+---
+
+### 6. Why does `generateMonthlyBalance` delegate to two private methods (`calculateMonthlySales` and `calculateMonthlyReturns`) instead of computing the net balance in a single combined loop?
+**Answer:**
+Separating the sales calculation from the returns calculation keeps each
+method focused on a single responsibility and easier to test in
+isolation. More importantly, it allows each figure to be exposed and
+displayed independently later — exactly what adjustment A6 requires
+when the console menu needs to show total sales, total returns, and
+the net balance as three separate figures instead of only the combined
+result.

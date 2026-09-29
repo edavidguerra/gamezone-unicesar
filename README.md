@@ -18,6 +18,9 @@ Proyecto académico — Taller 1 de Programación III, Universidad Popular del C
   automática de la mejor promoción vigente al registrar una venta.
 - Asignación automática de garantía básica a cada consola vendida, con opción de garantía
   extendida, y consulta de garantías activas o próximas a vencer.
+- Registro de devoluciones de productos dentro de los 30 días posteriores a la venta, con
+  reposición automática del inventario y cálculo del monto a reembolsar.
+- Balance mensual de ventas contra devoluciones.
 - Persistencia de todos los datos en archivos de texto dentro de la carpeta `data/`.
 
 ## Requirements

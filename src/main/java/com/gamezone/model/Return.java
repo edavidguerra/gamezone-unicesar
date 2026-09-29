@@ -76,12 +76,23 @@ public class Return {
     }
 
     /**
-     * Builds a human-readable return receipt in Spanish.
+     * Builds a human readable return receipt in Spanish with the return
+     * identifier, date, original sale, returned products with their
+     * prices, reason and refunded amount.
+     *
+     * @return the formatted receipt
      */
     public String generateReturnReceipt() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Recibo de devolucion ").append(id).append("\n");
+        sb.append("Recibo de devolucion: ").append(id).append("\n");
+        sb.append("Fecha: ").append(date).append("\n");
         sb.append("Venta original: ").append(originalSale.getId()).append("\n");
+        sb.append("Productos devueltos:\n");
+        for (Product product : returnedProducts) {
+            sb.append("  ").append(product.getId()).append(" - ")
+              .append(product.getTitle()).append(" - $")
+              .append(product.getPrice()).append("\n");
+        }
         sb.append("Motivo: ").append(reason).append("\n");
         sb.append("Monto reembolsado: ").append(refundAmount);
         return sb.toString();

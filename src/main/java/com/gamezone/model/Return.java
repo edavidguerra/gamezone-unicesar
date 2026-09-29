@@ -54,17 +54,30 @@ public class Return {
         this.refundAmount = calculateRefundAmount();
     }
 
+    /** @return the identifier of this return */
     public String getId() { return id; }
+
+    /** @return the date on which this return was registered */
     public LocalDate getDate() { return date; }
+
+    /** @return the sale this return refers to (never reassigned) */
     public Sale getOriginalSale() { return originalSale; }
+
+    /** @return the products returned, which may be a subset of the sale */
     public List<Product> getReturnedProducts() { return returnedProducts; }
+
+    /** @return the reason given for the return */
     public String getReason() { return reason; }
+
+    /** @return the amount refunded to the customer */
     public double getRefundAmount() { return refundAmount; }
 
     /**
      * Calculates the refund amount by summing the list price of every
      * returned product. Adjusted later by ajuste A5 to be proportional
      * to any discount applied on the original sale.
+     *
+     * @return the refund amount, also stored in the refundAmount attribute
      */
     public double calculateRefundAmount() {
         double total = 0.0;

@@ -65,3 +65,11 @@ If the system relies solely on stale persisted amounts, any subsequent changes t
 ### Note 6. Why does generateMonthlyBalance delegate to two private methods (calculateMonthlySales and calculateMonthlyReturns) instead of computing the net balance in a single combined loop?
 **Answer:**
 Separating the sales calculation from the returns calculation keeps each method focused on a single responsibility and easier to test in isolation. More importantly, it allows each figure to be exposed and displayed independently later—exactly what adjustment A6 requires when the console menu needs to show total sales, total returns, and the net balance as three separate figures instead of only the combined result.
+
+## Integration adjustments
+
+### A5 - Return of sales with a discount
+**Problem:** `Return.calculateRefundAmount` added up the list prices of the returned items, so when the original sale had a promotion, the customer was refunded more than they paid.
+**Cause:** The refund calculation ignored the discount stored in the original sale (`Sale.getDiscountAmount`).
+**Solution:** Each returned item is now refunded as `price * (1 - discount / subtotal)`, where `subtotal` is `Sale.calculateTotal()` and `discount` is `Sale.getDiscountAmount()`. The discount is proportional, so returning only part of the sale returns only that part of the discount. The extended warranty cost is not discounted and is handled by adjustment A7. `generateReturnReceipt` now shows, for each item, the list price, the proportional discount and the refunded amount.
+**Verification:** A sale with subtotal 2,380,000 and a 10% promotion (discount 238,000) was created; returning the console (2,000,000) refunds 1,800,000 and returning the accessory (180,000) refunds 162,000.

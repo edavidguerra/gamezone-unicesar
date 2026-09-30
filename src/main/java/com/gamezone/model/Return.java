@@ -73,19 +73,56 @@ public class Return {
     public double getRefundAmount() { return refundAmount; }
 
     /**
-     * Calculates the refund amount by summing the list price of every
-     * returned product. Adjusted later by ajuste A5 to be proportional
-     * to any discount applied on the original sale.
+     * Calculates the refund amount. Each returned item is refunded
+     * proportionally to the discount of the original sale:
+     * price * (1 - discount / subtotal). The extended warranty cost is not
+     * discounted, so it does not take part in this calculation.
      *
      * @return the refund amount, also stored in the refundAmount attribute
      */
     public double calculateRefundAmount() {
         double total = 0.0;
         for (Product product : returnedProducts) {
-            total += product.getPrice();
+            total += calculateItemRefund(product);
         }
         this.refundAmount = total;
         return total;
+    }
+
+    /**
+     * Returns the fraction of the sale subtotal that was discounted:
+     * discount / subtotal, or 0.0 when the sale had no discount.
+     *
+     * @return the discount rate of the original sale, between 0.0 and 1.0
+     */
+    public double getDiscountRate() {
+        double subtotal = originalSale.calculateTotal();
+        if (subtotal <= 0.0) {
+            return 0.0;
+        }
+        return originalSale.getDiscountAmount() / subtotal;
+    }
+
+    /**
+     * Calculates the part of an item's list price that was discounted in the
+     * original sale.
+     *
+     * @param product returned item
+     * @return proportional discount of the item's price
+     */
+    public double calculateItemDiscount(Product product) {
+        return product.getPrice() * getDiscountRate();
+    }
+
+    /**
+     * Calculates the amount refunded for one item: its list price minus its
+     * proportional discount.
+     *
+     * @param product returned item
+     * @return refund of the item: price * (1 - discount / subtotal)
+     */
+    public double calculateItemRefund(Product product) {
+        return product.getPrice() - calculateItemDiscount(product);
     }
 
     /**

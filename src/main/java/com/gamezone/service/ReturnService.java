@@ -1,5 +1,6 @@
 package com.gamezone.service;
 
+import com.gamezone.model.Accessory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -18,24 +19,27 @@ public class ReturnService {
     private final ReturnRepository repository;
     private final SaleService saleService;
     private final ProductService productService;
+    private final AccessoryService accessoryService;
     private List<Return> returns;
 
-        /**
+    /**
      * Creates the service and loads the persisted returns.
      *
      * @param repository persistence of returns
      * @param saleService service used to find and list sales
      * @param productService service used to restore product stock
+     * @param accessoryService service used to restore accessory stock
      */
     public ReturnService(ReturnRepository repository, SaleService saleService,
-            ProductService productService) {
+            ProductService productService, AccessoryService accessoryService) {
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
+        this.accessoryService = accessoryService;
         this.returns = repository.loadAll();
     }
 
-      /**
+    /**
      * Registers a return: validates that the sale exists, is inside the
      * 30-day window and contains every product, restores stock, and
      * persists the new return.
@@ -81,7 +85,7 @@ public class ReturnService {
         returnItem.calculateRefundAmount();
 
         for (Product product : returnedProducts) {
-            productService.restoreStock(product.getId(), 1);
+            restoreItemStock(product);
         }
 
         returns.add(returnItem);
@@ -89,7 +93,7 @@ public class ReturnService {
         return returnItem;
     }
 
-       /**
+    /**
      * Returns every registered return.
      *
      * @return list of all returns
@@ -98,24 +102,24 @@ public class ReturnService {
         return returns;
     }
 
-       /**
-        * Returns the returns whose original sale belongs to the given customer.
-        *
-        * @param customerId identifier of the customer
-        * @return list of returns of that customer (empty if none)
-        */
-       public List<Return> viewReturnsByCustomer(String customerId) {
-           List<Return> result = new ArrayList<>();
-           for (Return returnItem : returns) {
-               Sale sale = returnItem.getOriginalSale();
-               if (sale.getClient() != null && sale.getClient().getId().equals(customerId)) {
-                   result.add(returnItem);
-               }
-           }
-           return result;
-       }
+    /**
+     * Returns the returns whose original sale belongs to the given customer.
+     *
+     * @param customerId identifier of the customer
+     * @return list of returns of that customer (empty if none)
+     */
+    public List<Return> viewReturnsByCustomer(String customerId) {
+        List<Return> result = new ArrayList<>();
+        for (Return returnItem : returns) {
+            Sale sale = returnItem.getOriginalSale();
+            if (sale.getClient() != null && sale.getClient().getId().equals(customerId)) {
+                result.add(returnItem);
+            }
+        }
+        return result;
+    }
 
-     /**
+    /**
      * Returns the returns associated with the given sale.
      *
      * @param saleId identifier of the sale
@@ -132,10 +136,6 @@ public class ReturnService {
     }
 
     /**
-     * Net monthly balance: total sales minus total returns for the given
-     * month and year.
-     */
-       /**
      * Net monthly balance: total sales minus total returns for the given
      * month and year.
      *
@@ -201,6 +201,20 @@ public class ReturnService {
         }
         return count;
     }
+
+    /**
+     * Restores one unit of stock, delegating to the service that owns the
+     * inventory of the item: AccessoryService for accessories and
+     * ProductService for video games and consoles.
+     */
+    private void restoreItemStock(Product item) {
+        if (item instanceof Accessory) {
+            accessoryService.restoreStock(item.getId(), 1);
+        } else {
+            productService.restoreStock(item.getId(), 1);
+        }
+    }
+
     private String generateId() {
         return "R" + (returns.size() + 1);
     }

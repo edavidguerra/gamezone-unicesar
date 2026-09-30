@@ -20,7 +20,25 @@ The class stores the products in an attribute `List<Product> returnedProducts`. 
 
 The elements are references to the same `Product` objects that appear in the sale (video games, consoles and, after adjustment A4, accessories). If a product was bought twice and both units are returned, it appears twice in the list. The refund amount is calculated from this subset only, and when the return is persisted the list is saved as a comma-separated list of product ids.
 
-<!-- QUESTIONS 3 TO 5 -->
+### 3. In which layer is the 30-day rule validated, and how are the dates compared?
+**Answer:**
+The rule is a business rule, so it is enforced in the **service layer**: `ReturnService.registerReturn` calls `Sale.canBeReturned()` before creating anything and throws an `IllegalArgumentException` (message in Spanish) if the sale is outside the window. The check itself lives in `Sale` (model layer) because `Sale` owns the sale date, so it is the information expert; the service only decides what to do with the answer. It is not placed in the UI because the menu must only collect data and show messages (the same rule would have to be copied into every screen), and it is not placed in persistence because reading or writing files must never decide business rules.
+
+Dates are compared with the `java.time` API: the sale date is parsed with `LocalDate.parse(...)` and the difference in days is calculated with `ChronoUnit.DAYS.between(saleDate, LocalDate.now())`. The sale can be returned when that number is between 0 and 30.
+
+### 4. Which existing method restores the stock, and why is it reused?
+**Answer:**
+`ReturnService` calls `ProductService.restoreStock(String id, int quantity)`, which increases the stock of the product and saves the inventory through `ProductRepository`. It follows the same pattern as `ProductService.reduceStock`, the method used when a sale is registered. (After adjustment A4, accessories are restored through `AccessoryService.restoreStock` in the same way.)
+
+Reusing it is important because `ProductService` is the single owner of inventory rules and of their persistence. If `ReturnService` changed `product.setStock(...)` directly, the stock could be updated in memory but not saved to `products.csv`, and any future change to how stock is managed would have to be repeated in two places, which leads to inconsistent inventory.
+
+### 5. Where is the monthly balance report located, and what does it depend on?
+**Answer:**
+The report is `ReturnService.generateMonthlyBalance(int month, int year)`. It belongs to the service layer because it is business logic that combines data from two modules (sales and returns), and the UI (`ConsoleMenu`) only calls it and prints the result, which respects the flow ui -> service -> persistence -> model.
+
+It is placed in `ReturnService` and not in `SaleService` because `ReturnService` already depends on `SaleService` to find sales. Putting the report in `SaleService` would make sales depend on returns, creating a circular dependency between the two services.
+
+To generate the report, `ReturnService` needs: `SaleService` (to list the sales of the month and read the final total of each one), its own list of returns loaded through `ReturnRepository` (to add up the refunded amounts), and `ProductService` for the stock restoration that is part of the same return flow.
 
 ## Additional design notes
 

@@ -69,7 +69,7 @@ public class ConsoleMenu {
             System.out.println("4. Accessories menu");
             System.out.println("5. Promotions menu");
             System.out.println("6. Warranties menu");
-            System.out.println("7. Returns menu");
+            System.out.println("7. Menu de devoluciones");
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
             option = readInt();

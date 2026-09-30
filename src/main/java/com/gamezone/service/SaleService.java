@@ -35,10 +35,14 @@ public class SaleService {
         this.personService = personService;
         this.accessoryService = accessoryService;
         this.promotionService = promotionService;
+        // Sales can include accessories, so the catalog to resolve ids
+        // against must contain both the products and the accessories.
+        List<Product> catalog = new ArrayList<>(productService.listProducts());
+        catalog.addAll(accessoryService.listAllAccessories());
         this.sales = saleRepository.loadAll(
                 personService.listClients(),
                 personService.listSellers(),
-                productService.listProducts());
+                catalog);
     }
 
     public void setWarrantyService(WarrantyService warrantyService) {

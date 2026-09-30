@@ -103,4 +103,18 @@ public class ProductService {
             productRepository.saveAll(products);
         }
     }
+    /**
+     * Increases stock back for a product, used when a return brings
+     * it back into inventory.
+     *
+     * @param id product id
+     * @param quantity quantity to restore
+     */
+    public void restoreStock(String id, int quantity) {
+        Product product = findById(id);
+        if (product != null) {
+            product.setStock(product.getStock() + quantity);
+            productRepository.saveAll(products);
+        }
+    }
 }

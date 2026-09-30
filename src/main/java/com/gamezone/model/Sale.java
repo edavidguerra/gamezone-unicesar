@@ -1,11 +1,14 @@
 package com.gamezone.model;
 
 import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Represents a sale made in the store. A sale is associated with one
  * client, one seller and a list of one or more products sold.
  */
+
 public class Sale {
 
     private String id;
@@ -99,5 +102,16 @@ public class Sale {
         }
         sb.append("Total a pagar: ").append(finalTotal);
         return sb.toString();
+    }
+
+    /**
+     * Checks whether this sale is still within the 30-day return window,
+     * counted from its sale date until today.
+     */
+    
+    public boolean canBeReturned() {
+        LocalDate saleDate = LocalDate.parse(getDate());
+        long daysSinceSale = ChronoUnit.DAYS.between(saleDate, LocalDate.now());
+        return daysSinceSale >= 0 && daysSinceSale <= 30;
     }
 }

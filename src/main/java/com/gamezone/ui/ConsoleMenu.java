@@ -412,20 +412,24 @@ public class ConsoleMenu {
     }
 
     /**
-     * Returns submenu: registers returns, lists them and shows the
-     * monthly balance of sales against returns.
+     * Returns submenu: registers returns, lists them by different criteria
+     * and shows the monthly balance of sales against returns.
      */
     private void returnsMenu() {
-        System.out.println("\n--- Devoluciones ---");
+        System.out.println("\n--- Gestion de devoluciones ---");
         System.out.println("1. Registrar devolucion");
-        System.out.println("2. Ver todas las devoluciones");
-        System.out.println("3. Ver balance mensual");
+        System.out.println("2. Consultar todas las devoluciones");
+        System.out.println("3. Consultar devoluciones por cliente");
+        System.out.println("4. Consultar devoluciones por venta");
+        System.out.println("5. Consultar balance mensual");
         System.out.println("0. Volver");
         System.out.print("Elija una opcion: ");
         switch (readInt()) {
             case 1 -> registerReturnFlow();
             case 2 -> listAllReturnsFlow();
-            case 3 -> showMonthlyBalanceFlow();
+            case 3 -> listReturnsByCustomerFlow();
+            case 4 -> listReturnsBySaleFlow();
+            case 5 -> showMonthlyBalanceFlow();
             case 0 -> { /* back */ }
             default -> System.out.println("Opcion invalida.");
         }
@@ -452,9 +456,26 @@ public class ConsoleMenu {
     }
 
     private void listAllReturnsFlow() {
-        List<Return> returns = returnService.viewAllReturns();
+        printReturns(returnService.viewAllReturns(), "No hay devoluciones registradas.");
+    }
+
+    private void listReturnsByCustomerFlow() {
+        System.out.print("Id del cliente: ");
+        String customerId = scanner.nextLine();
+        printReturns(returnService.viewReturnsByCustomer(customerId),
+                "No hay devoluciones registradas para el cliente " + customerId + ".");
+    }
+
+    private void listReturnsBySaleFlow() {
+        System.out.print("Id de la venta: ");
+        String saleId = scanner.nextLine();
+        printReturns(returnService.viewReturnsBySale(saleId),
+                "No hay devoluciones registradas para la venta " + saleId + ".");
+    }
+
+    private void printReturns(List<Return> returns, String emptyMessage) {
         if (returns.isEmpty()) {
-            System.out.println("No hay devoluciones registradas.");
+            System.out.println(emptyMessage);
             return;
         }
         for (Return returnItem : returns) {

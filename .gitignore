@@ -26,4 +26,6 @@ replay_pid*
 data/products.csv
 data/clients.csv
 data/sales.csv
+data/returns.csv
+data/warranties.csv
 target/

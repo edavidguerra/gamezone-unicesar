@@ -177,7 +177,16 @@ public class ReturnService {
         }
     }
 
-    private double calculateMonthlyReturns(int month, int year) {
+    /**
+     * Total returns of the month, using the refunded amount of each return.
+     *
+     * @param month month of the year (1-12)
+     * @param year  four-digit year
+     * @return sum of the amounts refunded in that month
+     * @throws IllegalArgumentException if the month or year is invalid
+     */
+    public double calculateMonthlyReturns(int month, int year) {
+        validatePeriod(month, year);
         double total = 0.0;
         for (Return returnItem : returns) {
             if (returnItem.getDate().getMonthValue() == month

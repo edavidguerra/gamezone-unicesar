@@ -165,6 +165,9 @@ public class Return {
               .append(" | Descuento proporcional: -").append(calculateItemDiscount(product))
               .append(" | Reembolso: ").append(calculateItemRefund(product)).append("\n");
         }
+        if (warrantyRefund > 0) {
+            sb.append("Reembolso por garantias canceladas: ").append(warrantyRefund).append("\n");
+        }
         sb.append("Motivo: ").append(reason).append("\n");
         sb.append("Monto reembolsado: ").append(refundAmount);
         return sb.toString();

@@ -81,8 +81,8 @@ classDiagram
         +viewReturnsByCustomer(String customerId) List~Return~
         +viewReturnsBySale(String saleId) List~Return~
         +generateMonthlyBalance(int month, int year) double
-        -calculateMonthlySales(int month, int year) double
-        -calculateMonthlyReturns(int month, int year) double
+        +calculateMonthlySales(int month, int year) double
+        +calculateMonthlyReturns(int month, int year) double
     }
 
     class SaleService {

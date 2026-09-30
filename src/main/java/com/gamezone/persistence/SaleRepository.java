@@ -22,7 +22,9 @@ public class SaleRepository {
     private static final String SALES_FILE = "data/sales.csv";
 
     /**
-     * Saves the full list of sales to disk, overwriting the file.
+     * Saves the full list of sales to disk, overwriting the file. Besides the
+     * basic data, it stores the applied promotion name, the discount, the
+     * extended warranty cost and the final total, so they survive a restart.
      *
      * @param sales list of sales to persist
      */
@@ -36,9 +38,12 @@ public class SaleRepository {
                     }
                     productIds.append(product.getId());
                 }
+                String promotionName = sale.getAppliedPromotionName() == null
+                        ? "" : sale.getAppliedPromotionName();
                 writer.println(sale.getId() + "|" + sale.getDate() + "|"
                         + sale.getClient().getId() + "|" + sale.getSeller().getId() + "|"
-                        + productIds);
+                        + productIds + "|" + promotionName + "|" + sale.getDiscountAmount() + "|"
+                        + sale.getExtendedWarrantyCost() + "|" + sale.getFinalTotal());
             }
         } catch (IOException e) {
             System.out.println("Error saving sales: " + e.getMessage());
@@ -48,6 +53,7 @@ public class SaleRepository {
     /**
      * Loads all sales from disk, resolving client, seller and product
      * references from the lists already loaded by the other modules.
+     * Lines in the old 5-column format are still accepted.
      *
      * @param clients  clients already loaded by PersonService
      * @param sellers  sellers already loaded by PersonService
@@ -66,7 +72,7 @@ public class SaleRepository {
                 if (line.isBlank()) {
                     continue;
                 }
-                String[] parts = line.split("\\|");
+                String[] parts = line.split("\\|", -1);
                 Client client = findClient(clients, parts[2]);
                 Seller seller = findSeller(sellers, parts[3]);
                 List<Product> soldProducts = new ArrayList<>();
@@ -76,7 +82,19 @@ public class SaleRepository {
                         soldProducts.add(product);
                     }
                 }
-                sales.add(new Sale(parts[0], parts[1], client, seller, soldProducts));
+                Sale sale = new Sale(parts[0], parts[1], client, seller, soldProducts);
+                if (parts.length >= 9) {
+                    if (!parts[5].isEmpty()) {
+                        sale.setAppliedPromotionName(parts[5]);
+                    }
+                    sale.setDiscountAmount(Double.parseDouble(parts[6]));
+                    sale.setExtendedWarrantyCost(Double.parseDouble(parts[7]));
+                    sale.setFinalTotal(Double.parseDouble(parts[8]));
+                } else {
+                    // Old 5-column format: no saved totals, so use the plain subtotal.
+                    sale.setFinalTotal(sale.calculateTotal());
+                }
+                sales.add(sale);
             }
         } catch (IOException e) {
             System.out.println("Error loading sales: " + e.getMessage());

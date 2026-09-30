@@ -64,6 +64,23 @@ public class ReturnService {
         return returns;
     }
 
+       /**
+        * Returns the returns whose original sale belongs to the given customer.
+        *
+        * @param customerId identifier of the customer
+        * @return list of returns of that customer (empty if none)
+        */
+       public List<Return> viewReturnsByCustomer(String customerId) {
+           List<Return> result = new ArrayList<>();
+           for (Return returnItem : returns) {
+               Sale sale = returnItem.getOriginalSale();
+               if (sale.getClient() != null && sale.getClient().getId().equals(customerId)) {
+                   result.add(returnItem);
+               }
+           }
+           return result;
+       }
+       
     public List<Return> viewReturnsBySale(String saleId) {
         List<Return> result = new ArrayList<>();
         for (Return returnItem : returns) {

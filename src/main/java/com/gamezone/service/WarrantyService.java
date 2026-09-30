@@ -121,7 +121,19 @@ public class WarrantyService {
         return refundable;
     }
 
+    /**
+     * Generates the next warranty id from the highest existing number, so
+     * ids stay unique even after warranties have been cancelled.
+     */
     private String generateId() {
-        return "W" + (warranties.size() + 1);
+        int max = 0;
+        for (Warranty warranty : warranties) {
+            try {
+                max = Math.max(max, Integer.parseInt(warranty.getId().substring(1)));
+            } catch (NumberFormatException e) {
+                // Ignore ids that do not follow the W<number> pattern.
+            }
+        }
+        return "W" + (max + 1);
     }
 }

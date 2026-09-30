@@ -22,12 +22,22 @@ public class ReturnRepository {
 
     private final SaleService saleService;
     private final ProductService productService;
-
+    /**
+     * Creates the repository with the services needed to resolve
+     * references while loading.
+     *
+     * @param saleService used to resolve the original sale
+     * @param productService used to resolve the returned products
+     */
     public ReturnRepository(SaleService saleService, ProductService productService) {
         this.saleService = saleService;
         this.productService = productService;
     }
-
+    /**
+     * Saves the full list of returns to data/returns.csv, overwriting the file.
+     *
+     * @param returns returns to persist
+     */
     public void saveAll(List<Return> returns) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (Return returnItem : returns) {
@@ -44,7 +54,12 @@ public class ReturnRepository {
             System.out.println("Error al guardar devoluciones: " + e.getMessage());
         }
     }
-
+    /**
+     * Loads all returns from data/returns.csv, resolving the original sale and
+     * the returned products. Returns an empty list if the file does not exist.
+     *
+     * @return the returns read from disk
+     */
     public List<Return> loadAll() {
         List<Return> returns = new ArrayList<>();
         File file = new File(FILE_PATH);
@@ -68,9 +83,9 @@ public class ReturnRepository {
                 }
                 String reason = parts[4];
 
-                // El monto de reembolso NO se confia del archivo: se recalcula con la
-                // regla vigente, para que corregirla mas adelante (ajuste A5) actualice
-                // automaticamente hasta las devoluciones ya guardadas en disco.
+                 // The refund amount is NOT trusted from the file: it is recalculated
+                // with the current rule so that fixing the rule later (adjustment A5)
+                // also updates the returns already saved on disk.
                 Return returnItem = new Return(id, date, sale, products, reason);
                 returnItem.calculateRefundAmount();
                 returns.add(returnItem);

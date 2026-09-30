@@ -126,9 +126,9 @@ public class Return {
     }
 
     /**
-     * Builds a human readable return receipt in Spanish with the return
-     * identifier, date, original sale, returned products with their
-     * prices, reason and refunded amount.
+     * Builds a human readable return receipt in Spanish. For each item it
+     * shows the list price, the proportional discount and the refunded
+     * amount, followed by the reason and the total refund.
      *
      * @return the formatted receipt
      */
@@ -140,8 +140,10 @@ public class Return {
         sb.append("Productos devueltos:\n");
         for (Product product : returnedProducts) {
             sb.append("  ").append(product.getId()).append(" - ")
-              .append(product.getTitle()).append(" - $")
-              .append(product.getPrice()).append("\n");
+              .append(product.getTitle())
+              .append(" | Precio de lista: ").append(product.getPrice())
+              .append(" | Descuento proporcional: -").append(calculateItemDiscount(product))
+              .append(" | Reembolso: ").append(calculateItemRefund(product)).append("\n");
         }
         sb.append("Motivo: ").append(reason).append("\n");
         sb.append("Monto reembolsado: ").append(refundAmount);

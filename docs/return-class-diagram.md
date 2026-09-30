@@ -53,6 +53,9 @@ classDiagram
         +getReason() String
         +getRefundAmount() double
         +calculateRefundAmount() double
+        +getDiscountRate() double
+        +calculateItemDiscount(Product product) double
+        +calculateItemRefund(Product product) double
         +generateReturnReceipt() String
     }
 

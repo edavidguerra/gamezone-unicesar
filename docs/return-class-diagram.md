@@ -60,7 +60,8 @@ classDiagram
         -String FILE_PATH
         -SaleService saleService
         -ProductService productService
-        +ReturnRepository(SaleService saleService, ProductService productService)
+        -AccessoryService accessoryService
+        +ReturnRepository(SaleService saleService, ProductService productService, AccessoryService accessoryService)
         +saveAll(List~Return~ returns) void
         +loadAll() List~Return~
     }
@@ -69,8 +70,9 @@ classDiagram
         -ReturnRepository repository
         -SaleService saleService
         -ProductService productService
+        -AccessoryService accessoryService
         -List~Return~ returns
-        +ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService)
+        +ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService, AccessoryService accessoryService)
         +registerReturn(String saleId, List~String~ productIds, String reason) Return
         +viewAllReturns() List~Return~
         +viewReturnsByCustomer(String customerId) List~Return~
@@ -90,12 +92,20 @@ classDiagram
         +restoreStock(String id, int quantity) void
     }
 
+    class AccessoryService {
+        +findById(String id) Accessory
+        +restoreStock(String accessoryId, int quantity) void
+    }
+
     ConsoleMenu --> ReturnService : uses
     ReturnService --> ReturnRepository : persists through
     ReturnService --> SaleService : finds and lists sales
     ReturnService --> ProductService : restores stock
+    ReturnService --> AccessoryService : restoreStock for accessories
     ReturnRepository --> SaleService : resolves original sale
     ReturnRepository --> ProductService : resolves products
+    ReturnRepository --> AccessoryService : resolves accessories
     Return "*" --> "1" Sale : originalSale
     Return "*" --> "*" Product : returnedProducts
     Sale "1" --> "*" Product : products
+```

@@ -3,6 +3,7 @@ package com.gamezone.persistence;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
+import com.gamezone.service.AccessoryService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 
@@ -22,17 +23,23 @@ public class ReturnRepository {
 
     private final SaleService saleService;
     private final ProductService productService;
+    private final AccessoryService accessoryService;
+
     /**
      * Creates the repository with the services needed to resolve
      * references while loading.
      *
      * @param saleService used to resolve the original sale
-     * @param productService used to resolve the returned products
+     * @param productService used to resolve video games and consoles
+     * @param accessoryService used to resolve accessories
      */
-    public ReturnRepository(SaleService saleService, ProductService productService) {
+    public ReturnRepository(SaleService saleService, ProductService productService,
+            AccessoryService accessoryService) {
         this.saleService = saleService;
         this.productService = productService;
+        this.accessoryService = accessoryService;
     }
+
     /**
      * Saves the full list of returns to data/returns.csv, overwriting the file.
      *
@@ -54,6 +61,7 @@ public class ReturnRepository {
             System.out.println("Error al guardar devoluciones: " + e.getMessage());
         }
     }
+
     /**
      * Loads all returns from data/returns.csv, resolving the original sale and
      * the returned products. Returns an empty list if the file does not exist.
@@ -78,7 +86,7 @@ public class ReturnRepository {
                 List<Product> products = new ArrayList<>();
                 for (String productId : parts[3].split(",")) {
                     if (!productId.isBlank()) {
-                        products.add(productService.findById(productId));
+                        products.add(findItem(productId));
                     }
                 }
                 String reason = parts[4];
@@ -94,5 +102,17 @@ public class ReturnRepository {
             System.out.println("Error al leer devoluciones: " + e.getMessage());
         }
         return returns;
+    }
+
+    /**
+     * Resolves an item id as a product first and, if it is not found there,
+     * as an accessory.
+     */
+    private Product findItem(String itemId) {
+        Product product = productService.findById(itemId);
+        if (product == null) {
+            product = accessoryService.findById(itemId);
+        }
+        return product;
     }
 }

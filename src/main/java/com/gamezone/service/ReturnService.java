@@ -20,6 +20,13 @@ public class ReturnService {
     private final ProductService productService;
     private List<Return> returns;
 
+        /**
+     * Creates the service and loads the persisted returns.
+     *
+     * @param repository persistence of returns
+     * @param saleService service used to find and list sales
+     * @param productService service used to restore product stock
+     */
     public ReturnService(ReturnRepository repository, SaleService saleService,
             ProductService productService) {
         this.repository = repository;
@@ -82,6 +89,11 @@ public class ReturnService {
         return returnItem;
     }
 
+       /**
+     * Returns every registered return.
+     *
+     * @return list of all returns
+     */
     public List<Return> viewAllReturns() {
         return returns;
     }
@@ -103,6 +115,12 @@ public class ReturnService {
            return result;
        }
 
+     /**
+     * Returns the returns associated with the given sale.
+     *
+     * @param saleId identifier of the sale
+     * @return list of returns of that sale (empty if none)
+     */
     public List<Return> viewReturnsBySale(String saleId) {
         List<Return> result = new ArrayList<>();
         for (Return returnItem : returns) {
@@ -116,6 +134,14 @@ public class ReturnService {
     /**
      * Net monthly balance: total sales minus total returns for the given
      * month and year.
+     */
+       /**
+     * Net monthly balance: total sales minus total returns for the given
+     * month and year.
+     *
+     * @param month month of the year (1-12)
+     * @param year four-digit year
+     * @return net balance for the period
      */
     public double generateMonthlyBalance(int month, int year) {
         return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);

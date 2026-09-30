@@ -492,9 +492,11 @@ public class ConsoleMenu {
                 System.out.println("Mes invalido. Debe estar entre 1 y 12.");
                 return;
             }
-            // Only the net balance is shown for now; the sales/returns breakdown
-            // is added by ajuste A6 once ReturnService exposes both totals.
+            double sales = returnService.calculateMonthlySales(month, year);
+            double returns = returnService.calculateMonthlyReturns(month, year);
             double balance = returnService.generateMonthlyBalance(month, year);
+            System.out.println("Total de ventas del mes: " + sales);
+            System.out.println("Total de devoluciones del mes: " + returns);
             System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
         } catch (NumberFormatException e) {
             System.out.println("Valor invalido. Debe ingresar numeros enteros.");

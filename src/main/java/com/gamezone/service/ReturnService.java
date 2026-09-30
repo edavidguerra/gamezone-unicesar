@@ -142,6 +142,7 @@ public class ReturnService {
      * @param month month of the year (1-12)
      * @param year four-digit year
      * @return net balance for the period
+     * @throws IllegalArgumentException if the month or year is invalid
      */
     public double generateMonthlyBalance(int month, int year) {
         return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);

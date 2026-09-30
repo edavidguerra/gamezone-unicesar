@@ -28,6 +28,17 @@ public class ReturnService {
         this.returns = repository.loadAll();
     }
 
+      /**
+     * Registers a return: validates that the sale exists, is inside the
+     * 30-day window and contains every product, restores stock, and
+     * persists the new return.
+     *
+     * @param saleId identifier of the original sale
+     * @param productIds identifiers of the products being returned
+     * @param reason reason given by the customer
+     * @return the registered return
+     * @throws IllegalArgumentException with a Spanish message if any validation fails
+     */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = saleService.findById(saleId);
         if (sale == null) {
@@ -37,6 +48,9 @@ public class ReturnService {
             throw new IllegalArgumentException(
                     "La venta " + saleId + " supera los 30 dias permitidos para devolucion.");
         }
+        if (productIds == null || productIds.isEmpty()) {
+            throw new IllegalArgumentException("Debe indicar al menos un producto a devolver.");
+        }
 
         List<Product> returnedProducts = new ArrayList<>();
         for (String productId : productIds) {
@@ -44,6 +58,14 @@ public class ReturnService {
             if (product == null) {
                 throw new IllegalArgumentException(
                         "El producto " + productId + " no pertenece a la venta " + saleId + ".");
+            }
+            long available = countInSale(sale, productId)
+                    - countAlreadyReturned(saleId, productId)
+                    - countInList(returnedProducts, productId);
+            if (available <= 0) {
+                throw new IllegalArgumentException(
+                        "El producto " + productId + " ya fue devuelto en su totalidad de la venta "
+                        + saleId + ".");
             }
             returnedProducts.add(product);
         }
@@ -80,7 +102,7 @@ public class ReturnService {
            }
            return result;
        }
-       
+
     public List<Return> viewReturnsBySale(String saleId) {
         List<Return> result = new ArrayList<>();
         for (Return returnItem : returns) {
@@ -130,6 +152,29 @@ public class ReturnService {
         return null;
     }
 
+    private long countInSale(Sale sale, String productId) {
+        return countInList(sale.getProducts(), productId);
+    }
+
+    private long countInList(List<Product> products, String productId) {
+        long count = 0;
+        for (Product product : products) {
+            if (product.getId().equals(productId)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private long countAlreadyReturned(String saleId, String productId) {
+        long count = 0;
+        for (Return returnItem : returns) {
+            if (returnItem.getOriginalSale().getId().equals(saleId)) {
+                count += countInList(returnItem.getReturnedProducts(), productId);
+            }
+        }
+        return count;
+    }
     private String generateId() {
         return "R" + (returns.size() + 1);
     }

@@ -47,7 +47,7 @@ public class Main {
         WarrantyService warrantyService = new WarrantyService(warrantyRepository, saleService, productService);
         saleService.setWarrantyService(warrantyService);
 
-        ReturnRepository returnRepository = new ReturnRepository(saleService, productService);
+        ReturnRepository returnRepository = new ReturnRepository(saleService, productService, accessoryService);
         ReturnService returnService = new ReturnService(returnRepository, saleService, productService);
 
         ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService,

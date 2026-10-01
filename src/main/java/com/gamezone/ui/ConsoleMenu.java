@@ -336,7 +336,7 @@ public class ConsoleMenu {
         System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
         System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
         System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
-        System.out.print("Target category (VIDEOGAME, CONSOLE): "); String targetCategory = scanner.nextLine().toUpperCase();
+        System.out.print("Target category (VIDEOGAME, CONSOLE, ACCESSORY): "); String targetCategory = scanner.nextLine().toUpperCase();
         CategoryDiscount promo = promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
         System.out.println("Registered: " + promo.getName());
     }

@@ -94,7 +94,46 @@ public class WarrantyService {
         return expiring;
     }
 
+    /**
+     * Cancels every warranty (basic and extended) of a product in a given
+     * sale, for example because the product was returned, and persists the
+     * change.
+     *
+     * @param productId identifier of the returned product
+     * @param saleId    identifier of the sale the product belongs to
+     * @return refundable cost: zero for a basic warranty and the additional
+     *         cost for an extended warranty
+     */
+    public double cancelWarranties(String productId, String saleId) {
+        double refundable = 0.0;
+        List<Warranty> toRemove = new ArrayList<>();
+        for (Warranty warranty : warranties) {
+            if (warranty.getProduct().getId().equals(productId)
+                    && warranty.getSale().getId().equals(saleId)) {
+                refundable += warranty.getAdditionalCost();
+                toRemove.add(warranty);
+            }
+        }
+        if (!toRemove.isEmpty()) {
+            warranties.removeAll(toRemove);
+            repository.saveAll(warranties);
+        }
+        return refundable;
+    }
+
+    /**
+     * Generates the next warranty id from the highest existing number, so
+     * ids stay unique even after warranties have been cancelled.
+     */
     private String generateId() {
-        return "W" + (warranties.size() + 1);
+        int max = 0;
+        for (Warranty warranty : warranties) {
+            try {
+                max = Math.max(max, Integer.parseInt(warranty.getId().substring(1)));
+            } catch (NumberFormatException e) {
+                // Ignore ids that do not follow the W<number> pattern.
+            }
+        }
+        return "W" + (max + 1);
     }
 }

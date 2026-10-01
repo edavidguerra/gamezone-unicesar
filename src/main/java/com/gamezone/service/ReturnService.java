@@ -1,6 +1,7 @@
 package com.gamezone.service;
 
 import com.gamezone.model.Accessory;
+import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -20,22 +21,26 @@ public class ReturnService {
     private final SaleService saleService;
     private final ProductService productService;
     private final AccessoryService accessoryService;
+    private final WarrantyService warrantyService;
     private List<Return> returns;
 
     /**
      * Creates the service and loads the persisted returns.
      *
-     * @param repository persistence of returns
-     * @param saleService service used to find and list sales
-     * @param productService service used to restore product stock
+     * @param repository       persistence of returns
+     * @param saleService      service used to find and list sales
+     * @param productService   service used to restore product stock
      * @param accessoryService service used to restore accessory stock
+     * @param warrantyService  service used to cancel the warranties of returned consoles
      */
     public ReturnService(ReturnRepository repository, SaleService saleService,
-            ProductService productService, AccessoryService accessoryService) {
+            ProductService productService, AccessoryService accessoryService,
+            WarrantyService warrantyService) {
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
         this.accessoryService = accessoryService;
+        this.warrantyService = warrantyService;
         this.returns = repository.loadAll();
     }
 
@@ -87,6 +92,14 @@ public class ReturnService {
         for (Product product : returnedProducts) {
             restoreItemStock(product);
         }
+
+        double warrantyRefund = 0.0;
+        for (Product product : returnedProducts) {
+            if (product instanceof Console) {
+                warrantyRefund += warrantyService.cancelWarranties(product.getId(), sale.getId());
+            }
+        }
+        returnItem.addWarrantyRefund(warrantyRefund);
 
         returns.add(returnItem);
         repository.saveAll(returns);

@@ -55,7 +55,8 @@ public class ReturnRepository {
                 }
                 writer.println(returnItem.getId() + "|" + returnItem.getDate() + "|"
                         + returnItem.getOriginalSale().getId() + "|" + productIds + "|"
-                        + returnItem.getReason() + "|" + returnItem.getRefundAmount());
+                        + returnItem.getReason() + "|" + returnItem.getRefundAmount() + "|"
+                        + returnItem.getWarrantyRefund());
             }
         } catch (IOException e) {
             System.out.println("Error al guardar devoluciones: " + e.getMessage());
@@ -95,7 +96,9 @@ public class ReturnRepository {
                 // with the current rule so that fixing the rule later (adjustment A5)
                 // also updates the returns already saved on disk.
                 Return returnItem = new Return(id, date, sale, products, reason);
-                returnItem.calculateRefundAmount();
+                // Older lines have no warranty column; treat them as 0.
+                double warrantyRefund = parts.length > 6 ? Double.parseDouble(parts[6]) : 0.0;
+                returnItem.addWarrantyRefund(warrantyRefund);
                 returns.add(returnItem);
             }
         } catch (IOException e) {

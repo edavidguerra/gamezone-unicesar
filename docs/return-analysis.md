@@ -73,3 +73,9 @@ Separating the sales calculation from the returns calculation keeps each method 
 **Cause:** The refund calculation ignored the discount stored in the original sale (`Sale.getDiscountAmount`).
 **Solution:** Each returned item is now refunded as `price * (1 - discount / subtotal)`, where `subtotal` is `Sale.calculateTotal()` and `discount` is `Sale.getDiscountAmount()`. The discount is proportional, so returning only part of the sale returns only that part of the discount. The extended warranty cost is not discounted and is handled by adjustment A7. `generateReturnReceipt` now shows, for each item, the list price, the proportional discount and the refunded amount.
 **Verification:** A sale with subtotal 2,380,000 and a 10% promotion (discount 238,000) was created; returning the console (2,000,000) refunds 1,800,000 and returning the accessory (180,000) refunds 162,000.
+
+### A7 - Cancelation of extended warranties on returned consoles
+**Problem:** When a console with an active extended warranty was returned, the warranty remained active in the system, allowing future invalid claims.
+**Cause:** `ReturnService.registerReturn` did not notify `WarrantyService` to cancel active warranties associated with the returned products.
+**Solution:** `WarrantyService.cancelWarranties` was created to change the status of active warranties belonging to returned console IDs. `ReturnService` now invokes this method during return registration, adds the warranty refund amount to the return via `Return.addWarrantyRefund`, and persists the updated warranty refund value in `data/returns.csv`. The return receipt explicitly lists the refunded warranty amount when applicable.
+**Verification:** Registered a sale with a console and extended warranty, then processed a return for that console. The warranty status changed to cancelled, its cost was added to the total return refund, and the updated refund was reflected in both `returns.csv` and the return receipt.

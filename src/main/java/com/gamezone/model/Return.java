@@ -15,6 +15,7 @@ public class Return {
     private List<Product> returnedProducts;
     private String reason;
     private double refundAmount;
+    private double warrantyRefund;
 
     /**
      * Creates a return and calculates its refund amount.
@@ -72,11 +73,29 @@ public class Return {
     /** @return the amount refunded to the customer */
     public double getRefundAmount() { return refundAmount; }
 
+    /** @return the part of the refund that comes from cancelled extended warranties */
+    public double getWarrantyRefund() { return warrantyRefund; }
+
+    /**
+     * Adds the amount refunded for the cancelled warranties of the returned
+     * consoles and recalculates the total refund.
+     *
+     * @param amount refundable warranty cost, must not be negative
+     * @throws IllegalArgumentException if the amount is negative
+     */
+    public void addWarrantyRefund(double amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("El reembolso de garantia no puede ser negativo.");
+        }
+        this.warrantyRefund += amount;
+        calculateRefundAmount();
+    }
+
     /**
      * Calculates the refund amount. Each returned item is refunded
      * proportionally to the discount of the original sale:
      * price * (1 - discount / subtotal). The extended warranty cost is not
-     * discounted, so it does not take part in this calculation.
+     * discounted; the refund for cancelled warranties is added on top.
      *
      * @return the refund amount, also stored in the refundAmount attribute
      */
@@ -85,6 +104,7 @@ public class Return {
         for (Product product : returnedProducts) {
             total += calculateItemRefund(product);
         }
+        total += warrantyRefund;
         this.refundAmount = total;
         return total;
     }
@@ -144,6 +164,9 @@ public class Return {
               .append(" | Precio de lista: ").append(product.getPrice())
               .append(" | Descuento proporcional: -").append(calculateItemDiscount(product))
               .append(" | Reembolso: ").append(calculateItemRefund(product)).append("\n");
+        }
+        if (warrantyRefund > 0) {
+            sb.append("Reembolso por garantias canceladas: ").append(warrantyRefund).append("\n");
         }
         sb.append("Motivo: ").append(reason).append("\n");
         sb.append("Monto reembolsado: ").append(refundAmount);

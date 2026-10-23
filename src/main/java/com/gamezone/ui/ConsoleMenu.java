@@ -206,7 +206,7 @@ public class ConsoleMenu {
             String productId = scanner.nextLine();
             productIds.add(productId);
             Product product = productService.findById(productId);
-            if (product instanceof Console) {
+            if (product != null && product.isWarrantyEligible()) {
                 System.out.print("Garantia extendida para " + product.getTitle() + "? (s/n): ");
                 String answer = scanner.nextLine();
                 if (answer.equalsIgnoreCase("s") || answer.equalsIgnoreCase("y")) {

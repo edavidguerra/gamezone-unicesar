@@ -53,3 +53,39 @@ classDiagram
     SaleValidator ..> BusinessRuleException : throws
     SaleValidator ..> InvalidDataException : throws
 ```
+## Services and repositories integration
+
+```mermaid
+classDiagram
+    class ProductService {
+        +registerVideoGame(...) VideoGame
+        +registerConsole(...) Console
+    }
+    class PersonService {
+        +registerClient(String id, String name, String phone, String email) Client
+    }
+    class SaleService {
+        +registerSale(...) Sale
+    }
+    class ProductRepository {
+        +saveAll(List products)
+        +loadAll() List
+    }
+    class PersonRepository
+    class SaleRepository
+    class ProductValidator
+    class PersonValidator
+    class SaleValidator
+    class PersistenceException
+    ProductService ..> ProductValidator : validateProductData
+    PersonService ..> PersonValidator : validatePersonData, validateUniquePerson
+    SaleService ..> PersonValidator : validatePersonExists
+    SaleService ..> ProductValidator : validateProductExists, validateStockAvailability
+    SaleService ..> SaleValidator : validateSaleData
+    ProductService --> ProductRepository
+    PersonService --> PersonRepository
+    SaleService --> SaleRepository
+    ProductRepository ..> PersistenceException : throws on IOException
+    PersonRepository ..> PersistenceException : throws on IOException
+    SaleRepository ..> PersistenceException : throws on IOException
+```

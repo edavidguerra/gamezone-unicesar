@@ -17,23 +17,23 @@ import java.util.List;
 public class WarrantyService {
 
     private final WarrantyRepository repository;
-    private final SaleService saleService;
-    private final ProductService productService;
+    private final SaleLookup saleLookup;
+    private final ProductLookup productLookup;
     private List<Warranty> warranties;
 
-    public WarrantyService(WarrantyRepository repository, SaleService saleService,
-            ProductService productService) {
+    public WarrantyService(WarrantyRepository repository, SaleLookup saleLookup,
+            ProductLookup productLookup) {
         this.repository = repository;
-        this.saleService = saleService;
-        this.productService = productService;
+        this.saleLookup = saleLookup;
+        this.productLookup = productLookup;
         this.warranties = resolveRecords(repository.loadRawRecords());
     }
 
     private List<Warranty> resolveRecords(List<WarrantyRecord> records) {
         List<Warranty> resolved = new ArrayList<>();
         for (WarrantyRecord record : records) {
-            Product product = productService.findById(record.getProductId());
-            Sale sale = saleService.findById(record.getSaleId());
+            Product product = productLookup.findById(record.getProductId());
+            Sale sale = saleLookup.findById(record.getSaleId());
             LocalDate startDate = LocalDate.parse(record.getStartDate());
 
             Warranty warranty = record.getType().equals("BASIC")

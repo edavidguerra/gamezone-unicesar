@@ -241,12 +241,12 @@ public class ConsoleMenu {
         System.out.println("6. Find accessories compatible with a console");
         System.out.println("0. Back");
         switch (readInt()) {
-            case 1 -> registerControllerFlow();
-            case 2 -> registerCableFlow();
-            case 3 -> registerMemoryFlow();
-            case 4 -> listAllAccessoriesFlow();
-            case 5 -> listAccessoriesByTypeFlow();
-            case 6 -> listCompatibleAccessoriesFlow();
+            case 1 -> execute(this::registerControllerFlow);
+            case 2 -> execute(this::registerCableFlow);
+            case 3 -> execute(this::registerMemoryFlow);
+            case 4 -> execute(this::listAllAccessoriesFlow);
+            case 5 -> execute(this::listAccessoriesByTypeFlow);
+            case 6 -> execute(this::listCompatibleAccessoriesFlow);
             case 0 -> { /* back */ }
             default -> System.out.println("Invalid option.");
         }
@@ -322,11 +322,11 @@ public class ConsoleMenu {
         System.out.println("5. List active promotions");
         System.out.println("0. Back");
         switch (readInt()) {
-            case 1 -> registerPercentageDiscountFlow();
-            case 2 -> registerCategoryDiscountFlow();
-            case 3 -> registerBulkPurchaseDiscountFlow();
-            case 4 -> listAllPromotionsFlow();
-            case 5 -> listActivePromotionsFlow();
+            case 1 -> execute(this::registerPercentageDiscountFlow);
+            case 2 -> execute(this::registerCategoryDiscountFlow);
+            case 3 -> execute(this::registerBulkPurchaseDiscountFlow);
+            case 4 -> execute(this::listAllPromotionsFlow);
+            case 5 -> execute(this::listActivePromotionsFlow);
             case 0 -> { /* back */ }
             default -> System.out.println("Invalid option.");
         }
@@ -384,10 +384,10 @@ public class ConsoleMenu {
         System.out.println("4. List warranties expiring soon");
         System.out.println("0. Back");
         switch (readInt()) {
-            case 1 -> findWarrantyByProductFlow();
-            case 2 -> listAllWarrantiesFlow();
-            case 3 -> listActiveWarrantiesFlow();
-            case 4 -> listWarrantiesExpiringSoonFlow();
+            case 1 -> execute(this::findWarrantyByProductFlow);
+            case 2 -> execute(this::listAllWarrantiesFlow);
+            case 3 -> execute(this::listActiveWarrantiesFlow);
+            case 4 -> execute(this::listWarrantiesExpiringSoonFlow);
             case 0 -> { /* back */ }
             default -> System.out.println("Invalid option.");
         }

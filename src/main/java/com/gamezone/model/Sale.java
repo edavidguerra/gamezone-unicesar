@@ -87,6 +87,17 @@ public class Sale {
     }
 
     /**
+     * Calculates the amount the client pays: the subtotal minus the
+     * promotion discount plus the extended warranty surcharge. Sale owns
+     * the three values, so it is the expert on this total.
+     *
+     * @return the final total of the sale
+     */
+    public double calculateFinalTotal() {
+        return calculateTotal() - discountAmount + extendedWarrantyCost;
+    }
+
+    /**
      * Builds a human-readable receipt in Spanish showing the subtotal, the
      * applied promotion (if any), the extended warranty surcharge (if any)
      * and the final total to pay.

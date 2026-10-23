@@ -294,16 +294,8 @@ public class ConsoleMenu {
     private void listAccessoriesByTypeFlow() {
         System.out.print("Tipo (CONTROLLER, CABLE, MEMORY): ");
         String type = scanner.nextLine().toUpperCase();
-        for (Accessory accessory : accessoryService.listAllAccessories()) {
-            boolean matches = switch (type) {
-                case "CONTROLLER" -> accessory instanceof Controller;
-                case "CABLE" -> accessory instanceof Cable;
-                case "MEMORY" -> accessory instanceof Memory;
-                default -> false;
-            };
-            if (matches) {
-                System.out.println(accessory.getDescription());
-            }
+        for (Accessory accessory : accessoryService.listAccessoriesByType(type)) {
+            System.out.println(accessory.getDescription());
         }
     }
 

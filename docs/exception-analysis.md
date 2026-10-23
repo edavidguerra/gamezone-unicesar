@@ -137,3 +137,37 @@ an exception, and no `Sale` object is ever created. If the validation
 happened after construction, an incomplete or invalid `Sale` would already
 exist in memory with no further use, since it could not be safely saved or
 processed.
+
+## Question 4: Preserving external behaviour of the 10 menu operations
+
+The ten original operations are the ones of the first three submenus:
+register video game, register console and list products; register client,
+list clients and list sellers; register sale, list all sales, list sales by
+client and list sales by seller. The exception layer must not change what
+the user sees when these operations succeed.
+
+The strategy has three parts. First, the validators only reject what the
+system already rejected before: a missing client or seller, a product that
+does not exist, insufficient stock, a duplicated identifier or a sale with
+no products. They throw a typed exception where the old code threw
+`IllegalArgumentException` or returned `null`, so the happy path runs the
+same instructions in the same order. Second, the services keep their public
+signatures (names, parameters and return types), so `ConsoleMenu` calls them
+exactly as before and no caller had to change. Third, the only visible
+difference is in the error path: a failure now prints a Spanish message with
+its category (for example `[No encontrado]`) and returns to the menu, where
+before it ended the program with a stack trace.
+
+The check is a manual test run before and after the change, on a copy of
+the `data/` folder so that both runs start from the same files. Each of the
+ten operations is executed with fixed inputs (for example video game `VG90`,
+console `CO90`, client `C90` and sale `V90` with both products and an
+extended warranty) and the printed output is compared line by line. The same
+run then covers five error cases: a duplicated client, a sale with an
+unknown product, a negative price, text where a number is expected and a
+product without stock. The results of the successful operations (registered
+descriptions, listings and the sale receipt) were identical in both runs;
+only the menu labels changed, because they were translated to Spanish in
+the same requirement. The error cases changed from a crash to a message,
+which is the goal of this requirement. This run is also recorded as the baseline for
+the GRASP and SOLID refactors.

@@ -19,7 +19,7 @@ import java.util.List;
  * Contains the business rules related to sales: validating client and
  * seller, checking and discounting stock, and calculating totals.
  */
-public class SaleService {
+public class SaleService implements SaleLookup {
 
     private SaleRepository saleRepository;
     private ProductService productService;
@@ -119,6 +119,7 @@ public class SaleService {
         return sale;
     }
 
+    @Override
     public List<Sale> listSales() {
         return sales;
     }
@@ -143,6 +144,7 @@ public class SaleService {
         return result;
     }
 
+    @Override
     public Sale findById(String id) {
         for (Sale sale : sales) {
             if (sale.getId().equals(id)) {

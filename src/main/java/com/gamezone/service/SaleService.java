@@ -81,14 +81,11 @@ public class SaleService {
         SaleValidator.validateSaleData(client, seller, soldProducts);
 
         Sale sale = new Sale(id, LocalDate.now().toString(), client, seller, soldProducts);
-        double subtotal = sale.calculateTotal();
 
         Promotion bestPromotion = promotionService.findBestPromotionFor(sale);
-        double discount = 0.0;
         if (bestPromotion != null) {
-            discount = bestPromotion.calculateDiscount(sale);
             sale.setAppliedPromotionName(bestPromotion.getName());
-            sale.setDiscountAmount(discount);
+            sale.setDiscountAmount(bestPromotion.calculateDiscount(sale));
         }
 
         double warrantyCost = 0.0;
@@ -104,9 +101,8 @@ public class SaleService {
             }
         }
 
-        double finalTotal = subtotal - discount + warrantyCost;
         sale.setExtendedWarrantyCost(warrantyCost);
-        sale.setFinalTotal(finalTotal);
+        sale.setFinalTotal(sale.calculateFinalTotal());
 
         if (productIds != null) {
             for (String productId : productIds) {

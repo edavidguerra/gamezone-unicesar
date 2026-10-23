@@ -1,5 +1,6 @@
 package com.gamezone;
 
+import com.gamezone.exceptions.GameZoneException;
 import com.gamezone.persistence.AccessoryRepository;
 import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
@@ -30,28 +31,34 @@ import com.gamezone.ui.ConsoleMenu;
 public class Main {
 
     public static void main(String[] args) {
-        ProductRepository productRepository = new ProductRepository();
-        PersonRepository personRepository = new PersonRepository();
-        SaleRepository saleRepository = new SaleRepository();
-        AccessoryRepository accessoryRepository = new AccessoryRepository();
-        PromotionRepository promotionRepository = new PromotionRepository();
-        WarrantyRepository warrantyRepository = new WarrantyRepository();
+        try {
+            ProductRepository productRepository = new ProductRepository();
+            PersonRepository personRepository = new PersonRepository();
+            SaleRepository saleRepository = new SaleRepository();
+            AccessoryRepository accessoryRepository = new AccessoryRepository();
+            PromotionRepository promotionRepository = new PromotionRepository();
+            WarrantyRepository warrantyRepository = new WarrantyRepository();
 
-        ProductService productService = new ProductService(productRepository);
-        PersonService personService = new PersonService(personRepository);
-        AccessoryService accessoryService = new AccessoryService(accessoryRepository);
-        PromotionService promotionService = new PromotionService(promotionRepository);
-        SaleService saleService = new SaleService(saleRepository, productService,
-                personService, accessoryService, promotionService);
+            ProductService productService = new ProductService(productRepository);
+            PersonService personService = new PersonService(personRepository);
+            AccessoryService accessoryService = new AccessoryService(accessoryRepository);
+            PromotionService promotionService = new PromotionService(promotionRepository);
+            SaleService saleService = new SaleService(saleRepository, productService,
+                    personService, accessoryService, promotionService);
 
-        WarrantyService warrantyService = new WarrantyService(warrantyRepository, saleService, productService);
-        saleService.setWarrantyService(warrantyService);
+            WarrantyService warrantyService = new WarrantyService(warrantyRepository, saleService, productService);
+            saleService.setWarrantyService(warrantyService);
 
-        ReturnRepository returnRepository = new ReturnRepository(saleService, productService, accessoryService);
-        ReturnService returnService = new ReturnService(returnRepository, saleService, productService, accessoryService, warrantyService);
+            ReturnRepository returnRepository = new ReturnRepository(saleService, productService, accessoryService);
+            ReturnService returnService = new ReturnService(returnRepository, saleService, productService, accessoryService, warrantyService);
 
-        ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService,
-                accessoryService, promotionService, warrantyService, returnService);
-        menu.start();
+            ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService,
+                    accessoryService, promotionService, warrantyService, returnService);
+            menu.start();
+        } catch (GameZoneException e) {
+            // Repositories read their files while the services are built,
+            // so a corrupt or unreadable data file is reported here.
+            System.out.println("No se pudo iniciar GameZone: " + e.getMessage());
+        }
     }
 }

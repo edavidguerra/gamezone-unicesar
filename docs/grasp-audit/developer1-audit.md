@@ -1,0 +1,45 @@
+# GRASP Audit - Developer 1
+
+Auditor: Gustavo Rodriguez (Developer 1). ID range: V-10 to V-19.
+Audited on `develop` at commit `2f00b33`.
+
+Scope: product hierarchy (`Product`, `VideoGame`, `Console`), accessory hierarchy (`Accessory`,
+`Controller`, `Cable`, `Memory`), promotion hierarchy (`Promotion` and its three discounts),
+warranty hierarchy (`Warranty`, `BasicWarranty`, `ExtendedWarranty`), `Return`,
+`ProductService`, `ProductRepository`, the `exceptions` package and the `validation` package.
+Line numbers refer to that commit.
+
+Rows with `-` as ID are patterns that were checked and have no violation in this scope.
+
+## Information Expert and Creator
+
+| ID | Pattern/Principle | Class.method (line) | Evidence | Why it is a violation | Proposed fix | Severity |
+|---|---|---|---|---|---|---|
+| V-12 | Information Expert | ProductService.restoreStock (116-122) | `product.setStock(product.getStock() + quantity)` (119) | `Product` owns `stock` and already knows how to check it (`hasStock`, 50) and lower it (`reduceStock`, 60), but the opposite operation is done outside, in the service. The stock arithmetic is split between two classes, and `AccessoryService.restoreStock` (166) repeats the same line (V-25, Developer 2) | Add `public void increaseStock(int quantity)` to `Product`; `restoreStock` only calls `product.increaseStock(quantity)` | Medium |
+| - | Information Expert | Return.calculateRefundAmount, getDiscountRate, calculateItemRefund | The refund is computed inside `Return` from `originalSale` and `returnedProducts` | No violation found: `Return` holds the sale reference and the returned items, so it is the expert on the refund. `ReturnService` only adds the warranty part through `addWarrantyRefund` | - | - |
+| - | Information Expert | Promotion.calculateDiscount (48) and its three subclasses | Each discount computes its amount from the `Sale` it receives | No violation found: the percentage, the target category and the minimum quantity live in each promotion, so each one is the expert on its own discount | - | - |
+| - | Creator | ProductService.registerVideoGame (39), registerConsole (54); ProductRepository.loadAll (75, 79) | `new VideoGame(...)`, `new Console(...)` | No violation found: the service creates the product after validating the data received from the menu, so it has the initializing data and keeps the list that contains the product. The repository creates products while reading `products.csv`, the only place where the saved data exists | - | - |
+| - | Creator | PromotionService.registerPercentageDiscount (27), registerCategoryDiscount (39), registerBulkPurchaseDiscount (48); PromotionRepository (74-78) | `new PercentageDiscount(...)`, `new CategoryDiscount(...)`, `new BulkPurchaseDiscount(...)` | No violation found: the service has the initializing data and keeps the list of promotions; the repository rebuilds each promotion from its saved line | - | - |
+| - | Creator | WarrantyService.assignBasicWarranty (48), assignExtendedWarranty (55), resolveRecords (40-41) | `new BasicWarranty(...)`, `new ExtendedWarranty(...)` | No violation found: the warranty needs a product and a sale, and `WarrantyService` is the class that receives both and keeps the list of warranties | - | - |
+| - | Creator | ReturnService.registerReturn (92); ReturnRepository.loadAll (100) | `new Return(...)` | No violation found: the service creates the return only after it has resolved the sale and every returned product, so it has all the initializing data. The repository rebuilds returns from the saved file | - | - |
+
+## Polymorphism
+
+| ID | Pattern/Principle | Class.method (line) | Evidence | Why it is a violation | Proposed fix | Severity |
+|---|---|---|---|---|---|---|
+| V-10 | Polymorphism | CategoryDiscount.belongsToTargetCategory (37-48) | `if ("VIDEOGAME".equals(targetCategory)) return product instanceof VideoGame;` and the same for `Console` (42) and `Accessory` (45) | The promotion asks for the concrete class of each product. A new product type forces editing this method, and the category names only exist as strings inside it | Add abstract `String getCategory()` to `Product`: `VideoGame` returns `"VIDEOGAME"`, `Console` `"CONSOLE"`, `Accessory` `"ACCESSORY"`. The method becomes `return targetCategory.equals(product.getCategory());` | High |
+| V-11 | Polymorphism | SaleService.registerSale (96), ReturnService.registerReturn (101), ConsoleMenu.registerSale (209) | `instanceof Console` in the three methods | Three classes in two layers repeat the rule "only consoles have a warranty". If another product gets a warranty, the three classes must change at the same time | Add `public boolean isWarrantyEligible() { return false; }` to `Product` and override it in `Console` with `return true;`. Each caller is fixed by its owner: V-02 and V-03 (leader), V-21 (Developer 2) | High |
+| V-13 | Polymorphism | Accessory (whole class); ConsoleMenu.listAccessoriesByTypeFlow (298-302) | `case "CONTROLLER" -> accessory instanceof Controller;` and the same for `Cable` and `Memory` | An accessory cannot say which type it is, so the UI has to test the class. The tokens `CONTROLLER`, `CABLE` and `MEMORY` are written in `AccessoryRepository.toLine` (86-100) and in the menu, but no model class owns them | Add abstract `String getAccessoryType()` to `Accessory`: `Controller` returns `"CONTROLLER"`, `Cable` `"CABLE"`, `Memory` `"MEMORY"` (the same tokens `AccessoryRepository` already uses). Developer 2 uses it in `AccessoryService.listAccessoriesByType` (V-23) | Medium |
+| V-14 | Polymorphism | Warranty.getWarrantyType (47); WarrantyRepository.saveAll (63); WarrantyService.resolveRecords (39) | `(warranty instanceof BasicWarranty) ? "BASIC" : "EXTENDED"`, while `getWarrantyType()` returns `"Basica"` / `"Extendida"` | The only type method returns text for the user, not a stable code, so the repository has to test the class to write the file. A third warranty type would be saved as `EXTENDED` without any error | Add abstract `String getTypeCode()` to `Warranty`: `BasicWarranty` returns `"BASIC"`, `ExtendedWarranty` `"EXTENDED"`. `getWarrantyType()` stays for the certificate. Developer 2 uses it in the repository (V-24) | Medium |
+| - | Polymorphism | Product.getDescription (72), Promotion.calculateDiscount (48), Warranty.getDurationInMonths (46) and getAdditionalCost (48) | Abstract methods overridden in every subclass; `Warranty` computes `endDate` with `getDurationInMonths()` (24) | No violation found: these behaviors already vary by subclass without any `instanceof`, so a new subclass only adds its own implementation | - | - |
+
+## High Cohesion, Pure Fabrication and Protected Variations
+
+| ID | Pattern/Principle | Class.method (line) | Evidence | Why it is a violation | Proposed fix | Severity |
+|---|---|---|---|---|---|---|
+| V-15 | Protected Variations | ProductRepository.saveAll (33-43), loadAll (74-82) | `instanceof VideoGame` / `instanceof Console` when writing and `type.equals("VIDEOGAME")` / `type.equals("CONSOLE")` when reading | A new product type forces editing the repository in two places | Rejected: converting objects to lines of a file is the responsibility of the repository, which is a Pure Fabrication. Moving that mapping into `Product` would make the model know the file format and break the rule that `model` does not depend on persistence. The variation stays contained in one class | Rejected |
+| - | High Cohesion | `exceptions` package (`GameZoneException` and its four subclasses) | Each subclass represents one error category with its own code: `RESOURCE_NOT_FOUND`, `BUSINESS_RULE`, `INVALID_DATA` and `PERSISTENCE`; the base class only stores the message and the code | No violation found: every exception class has a single, focused purpose and no business logic | - | - |
+| - | High Cohesion | ProductService | Registers, lists, finds and updates the stock of video games and consoles | No violation found: all its methods work on the same list of products and delegate validation and file access | - | - |
+| - | Pure Fabrication | ProductValidator, PersonValidator, SaleValidator | Static validation methods called from the services (ProductService 38 and 53, PersonService 42 and 45, SaleService 61-76, ReturnService 66) | No violation found: they are invented classes, not domain concepts, that keep the validation rules out of the models and the services, so the same check is written once and reused | - | - |
+| - | Pure Fabrication | ProductRepository.saveAll (30), loadAll (58) | Reads and writes `data/products.csv` and converts `IOException` into `PersistenceException` (46, 85) | No violation found: it keeps file access out of `Product` and `ProductService` | - | - |
+| - | Protected Variations | `GameZoneException` hierarchy; ConsoleMenu.execute (516-531) | The menu catches the four categories and `GameZoneException`, never a specific validation | No violation found: the UI depends on stable error categories, so a new validation inside a service or validator does not change the menu | - | - |

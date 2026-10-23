@@ -180,10 +180,16 @@ public class ConsoleMenu {
         System.out.println("4. List sales by seller");
         System.out.print("Choose an option: ");
         switch (readInt()) {
-            case 1 -> registerSale();
-            case 2 -> printSales(saleService.listSales());
-            case 3 -> { System.out.print("Client id: "); printSales(saleService.listSalesByClient(scanner.nextLine())); }
-            case 4 -> { System.out.print("Seller id: "); printSales(saleService.listSalesBySeller(scanner.nextLine())); }
+            case 1 -> execute(this::registerSale);
+            case 2 -> execute(() -> printSales(saleService.listSales()));
+            case 3 -> execute(() -> {
+                System.out.print("Client id: ");
+                printSales(saleService.listSalesByClient(scanner.nextLine()));
+            });
+            case 4 -> execute(() -> {
+                System.out.print("Seller id: ");
+                printSales(saleService.listSalesBySeller(scanner.nextLine()));
+            });
             default -> System.out.println("Invalid option.");
         }
     }

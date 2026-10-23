@@ -54,27 +54,29 @@ individual audit and are not repeated here.
 
 | ID | Pattern/Principle | Class.method (line) | Owner | Severity | Status |
 |---|---|---|---|---|---|
-| V-01 | Information Expert | SaleService.registerSale (84-109) | Leader | High | Open |
-| V-02 | Polymorphism | SaleService.registerSale (96) | Leader | Medium | Open, needs V-11 |
-| V-03 | Polymorphism | ConsoleMenu.registerSale (209) | Leader | Medium | Open, needs V-11 |
-| V-04 | Controller / High Cohesion | ConsoleMenu.listAccessoriesByTypeFlow (294-308) | Leader | Medium | Open, needs V-23 |
+| V-01 | Information Expert | SaleService.registerSale (84-109) | Leader | High | Fixed (`239c21c`) |
+| V-02 | Polymorphism | SaleService.registerSale (96) | Leader | Medium | Fixed (`0b4c0de`) |
+| V-03 | Polymorphism | ConsoleMenu.registerSale (209) | Leader | Medium | Fixed (`989f294`) |
+| V-04 | Controller / High Cohesion | ConsoleMenu.listAccessoriesByTypeFlow (294-308) | Leader | Medium | Fixed (`50d6a86`) |
 | V-05 | Low Coupling | Main.main (49-50), SaleService.setWarrantyService (51) | Leader | Medium | Deferred to Requirement 8 (V-32) |
 | V-06 | Protected Variations / Indirection | SaleService fields (25), Main.main (37) | Leader | Low | Deferred to Requirement 8 (V-31) |
-| V-10 | Polymorphism | CategoryDiscount.belongsToTargetCategory (37-48) | Developer 1 | High | Open |
-| V-11 | Polymorphism | Product (new `isWarrantyEligible`) | Developer 1 | High | Open |
-| V-12 | Information Expert | ProductService.restoreStock (116-122) | Developer 1 | Medium | Open |
-| V-13 | Polymorphism | Accessory (new `getAccessoryType`) | Developer 1 | Medium | Open |
-| V-14 | Polymorphism | Warranty (new `getTypeCode`) | Developer 1 | Medium | Open |
+| V-10 | Polymorphism | CategoryDiscount.belongsToTargetCategory (37-48) | Developer 1 | High | Fixed (`71c0bca, 0170d28`) |
+| V-11 | Polymorphism | Product (new `isWarrantyEligible`) | Developer 1 | High | Fixed (`2faab25`) |
+| V-12 | Information Expert | ProductService.restoreStock (116-122) | Developer 1 | Medium | Fixed (`9c004d2`) |
+| V-13 | Polymorphism | Accessory (new `getAccessoryType`) | Developer 1 | Medium | Fixed (`c121391`) |
+| V-14 | Polymorphism | Warranty (new `getTypeCode`) | Developer 1 | Medium | Fixed (`752bca4`) |
 | V-15 | Protected Variations | ProductRepository.saveAll (33-43), loadAll (74-82) | Developer 1 | - | Rejected (mapping to the file belongs to the repository) |
-| V-20 | Low Coupling / Indirection | ReturnRepository constructor (37), imports (7-9) | Developer 2 | High | Open |
-| V-21 | Polymorphism | ReturnService.registerReturn (101) | Developer 2 | Medium | Open, needs V-11 |
-| V-22 | Polymorphism | ReturnService.restoreItemStock (256) | Developer 2 | Medium | Open, needs V-10 |
-| V-23 | Information Expert / Controller | AccessoryService (new `listAccessoriesByType`) | Developer 2 | Medium | Open, needs V-13 |
-| V-24 | Polymorphism | WarrantyRepository.saveAll (63) | Developer 2 | Medium | Open, needs V-14 |
-| V-25 | Information Expert | AccessoryService.restoreStock (166) | Developer 2 | Low | Open, needs V-12 |
+| V-20 | Low Coupling / Indirection | ReturnRepository constructor (37), imports (7-9) | Developer 2 | High | Fixed (`fe94892`) |
+| V-21 | Polymorphism | ReturnService.registerReturn (101) | Developer 2 | Medium | Fixed (`555b658`) |
+| V-22 | Polymorphism | ReturnService.restoreItemStock (256) | Developer 2 | Medium | Fixed (`7b78363`) |
+| V-23 | Information Expert / Controller | AccessoryService (new `listAccessoriesByType`) | Developer 2 | Medium | Fixed (`c44fa4d`) |
+| V-24 | Polymorphism | WarrantyRepository.saveAll (63) | Developer 2 | Medium | Fixed (`a24de8f`) |
+| V-25 | Information Expert | AccessoryService.restoreStock (166) | Developer 2 | Low | Fixed (`df719f5`) |
 | V-26 | Low Coupling | WarrantyService fields and constructor (20-25) | Developer 2 | Medium | Deferred to Requirement 8 (V-55) |
 
-Totals: 19 findings. 15 open, 3 deferred to Requirement 8 and 1 rejected.
+Totals: 19 findings. 15 fixed in the GRASP refactor, 3 deferred to Requirement 8 and 1
+rejected. The commits are listed in `docs/grasp-refactor-log.md`, and the final
+non-regression check matched the baseline.
 
 ## Related findings
 

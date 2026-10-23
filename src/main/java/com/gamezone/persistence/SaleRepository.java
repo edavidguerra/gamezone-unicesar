@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Client;
 import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
@@ -46,7 +47,8 @@ public class SaleRepository {
                         + sale.getExtendedWarrantyCost() + "|" + sale.getFinalTotal());
             }
         } catch (IOException e) {
-            System.out.println("Error saving sales: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + SALES_FILE
+                    + " (operacion: guardado de ventas): " + e.getMessage(), e);
         }
     }
 
@@ -97,7 +99,8 @@ public class SaleRepository {
                 sales.add(sale);
             }
         } catch (IOException e) {
-            System.out.println("Error loading sales: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + SALES_FILE
+                    + " (operacion: carga de ventas): " + e.getMessage(), e);
         }
         return sales;
     }

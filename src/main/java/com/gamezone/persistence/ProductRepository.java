@@ -1,4 +1,5 @@
 package com.gamezone.persistence;
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.VideoGame;
@@ -42,7 +43,8 @@ public class ProductRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving products: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + PRODUCTS_FILE
+                    + " (operacion: guardado de productos): " + e.getMessage(), e);
         }
     }
 
@@ -80,7 +82,8 @@ public class ProductRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading products: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + PRODUCTS_FILE
+                    + " (operacion: carga de productos): " + e.getMessage(), e);
         }
         return products;
     }

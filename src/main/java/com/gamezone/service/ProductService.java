@@ -3,6 +3,7 @@ import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.VideoGame;
 import com.gamezone.persistence.ProductRepository;
+import com.gamezone.validation.ProductValidator;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class ProductService {
 
     public VideoGame registerVideoGame(String id, String title, double price, int stock,
                                         String platform, String genre, String ageRating) {
+        ProductValidator.validateProductData(id, title, price, stock);
         VideoGame videoGame = new VideoGame(id, title, price, stock, platform, genre, ageRating);
         products.add(videoGame);
         productRepository.saveAll(products);
@@ -48,6 +50,7 @@ public class ProductService {
 
     public Console registerConsole(String id, String title, double price, int stock,
                                     String brand, String model, String generation) {
+        ProductValidator.validateProductData(id, title, price, stock);
         Console console = new Console(id, title, price, stock, brand, model, generation);
         products.add(console);
         productRepository.saveAll(products);

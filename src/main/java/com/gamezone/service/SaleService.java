@@ -8,6 +8,9 @@ import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Seller;
 import com.gamezone.persistence.SaleRepository;
+import com.gamezone.validation.PersonValidator;
+import com.gamezone.validation.ProductValidator;
+import com.gamezone.validation.SaleValidator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,40 +58,27 @@ public class SaleService {
         Client client = personService.findClientById(clientId);
         Seller seller = personService.findSellerById(sellerId);
 
-        if (client == null || seller == null) {
-            throw new IllegalArgumentException("Client or seller not found.");
-        }
-        boolean noProducts = productIds == null || productIds.isEmpty();
-        boolean noAccessories = accessoryIds == null || accessoryIds.isEmpty();
-        if (noProducts && noAccessories) {
-            throw new IllegalArgumentException("A sale must contain at least one product.");
-        }
-        if (productIds != null) {
-            for (String productId : productIds) {
-                if (!productService.hasStock(productId, 1)) {
-                    throw new IllegalStateException("Insufficient stock for product: " + productId);
-                }
-            }
-        }
-        if (accessoryIds != null) {
-            for (String accessoryId : accessoryIds) {
-                if (!accessoryService.hasStock(accessoryId, 1)) {
-                    throw new IllegalStateException("Insufficient stock for accessory: " + accessoryId);
-                }
-            }
-        }
+        PersonValidator.validatePersonExists(client, clientId);
+        PersonValidator.validatePersonExists(seller, sellerId);
 
         List<Product> soldProducts = new ArrayList<>();
         if (productIds != null) {
             for (String productId : productIds) {
-                soldProducts.add(productService.findById(productId));
+                Product product = productService.findById(productId);
+                ProductValidator.validateProductExists(product, productId);
+                ProductValidator.validateStockAvailability(product, 1);
+                soldProducts.add(product);
             }
         }
         if (accessoryIds != null) {
             for (String accessoryId : accessoryIds) {
-                soldProducts.add(accessoryService.findById(accessoryId));
+                Product accessory = accessoryService.findById(accessoryId);
+                ProductValidator.validateProductExists(accessory, accessoryId);
+                ProductValidator.validateStockAvailability(accessory, 1);
+                soldProducts.add(accessory);
             }
         }
+        SaleValidator.validateSaleData(client, seller, soldProducts);
 
         Sale sale = new Sale(id, LocalDate.now().toString(), client, seller, soldProducts);
         double subtotal = sale.calculateTotal();

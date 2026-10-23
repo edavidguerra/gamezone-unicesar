@@ -1,7 +1,8 @@
 # GameZone Unicesar
 
 Sistema de información de la tienda de videojuegos GameZone Unicesar, desarrollado en Java con
-Maven, organizado en cuatro capas (model, persistence, service, ui).
+Maven, organizado en cuatro capas (model, persistence, service, ui), con los paquetes
+transversales `exceptions` y `validation`.
 
 Proyecto académico — Programación III, Universidad Popular del Cesar.
 
@@ -66,6 +67,27 @@ Análisis y diagramas por módulo:
 - Promociones: `docs/promotion-analysis.md` y `docs/promotion-class-diagram.md`.
 - Garantías: `docs/warranty-analysis.md` y `docs/warranty-class-diagram.md`.
 - Devoluciones: `docs/return-analysis.md` y `docs/return-class-diagram.md`.
+
+## Manejo de errores
+
+El sistema usa una jerarquía propia de excepciones no verificadas (paquete `exceptions`) y
+validadores con métodos estáticos (paquete `validation`). Los servicios llaman a los
+validadores antes de cada operación y los repositorios convierten los `IOException` en
+`PersistenceException`. `ConsoleMenu` atrapa cada categoría por separado, muestra un mensaje
+en español y vuelve al menú, sin cerrar el programa.
+
+| Excepción | Cuándo se lanza | Mensaje en consola |
+|---|---|---|
+| `ResourceNotFoundException` | Producto, cliente, vendedor o venta inexistente | `[No encontrado] ...` |
+| `BusinessRuleException` | Stock insuficiente, cliente duplicado, venta sin productos, devolución fuera de plazo | `[Operacion no permitida] ...` |
+| `InvalidDataException` | Campo vacío, precio o stock fuera de rango, correo o categoría inválidos | `[Dato invalido] ...` |
+| `PersistenceException` | Error al leer o escribir un archivo de `data/` | `[Error de almacenamiento] ...` |
+
+Si un archivo de datos no se puede leer al iniciar, `Main` muestra
+`No se pudo iniciar GameZone: ...` en lugar de un error de Java.
+
+Documentación: `docs/exception-analysis.md` (preguntas 1 a 5) y
+`docs/exception-class-diagram.md` (diagrama de excepciones, validadores y su integración).
 
 ## Data persistence
 

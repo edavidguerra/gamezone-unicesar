@@ -1,5 +1,10 @@
 package com.gamezone.ui;
 
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.GameZoneException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.PersistenceException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.BulkPurchaseDiscount;
 import com.gamezone.model.Cable;
@@ -25,6 +30,7 @@ import com.gamezone.service.SaleService;
 import com.gamezone.service.WarrantyService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -63,15 +69,15 @@ public class ConsoleMenu {
         int option;
         do {
             System.out.println("\n==== GameZone Unicesar ====");
-            System.out.println("1. Products menu");
-            System.out.println("2. People menu");
-            System.out.println("3. Sales menu");
-            System.out.println("4. Accessories menu");
-            System.out.println("5. Promotions menu");
-            System.out.println("6. Warranties menu");
+            System.out.println("1. Menu de productos");
+            System.out.println("2. Menu de personas");
+            System.out.println("3. Menu de ventas");
+            System.out.println("4. Menu de accesorios");
+            System.out.println("5. Menu de promociones");
+            System.out.println("6. Menu de garantias");
             System.out.println("7. Menu de devoluciones");
-            System.out.println("0. Exit");
-            System.out.print("Choose an option: ");
+            System.out.println("0. Salir");
+            System.out.print("Elija una opcion: ");
             option = readInt();
             switch (option) {
                 case 1 -> productsMenu();
@@ -81,48 +87,48 @@ public class ConsoleMenu {
                 case 5 -> promotionsMenu();
                 case 6 -> warrantiesMenu();
                 case 7 -> returnsMenu();
-                case 0 -> System.out.println("Goodbye!");
-                default -> System.out.println("Invalid option.");
+                case 0 -> System.out.println("Hasta luego!");
+                default -> System.out.println("Opcion invalida.");
             }
         } while (option != 0);
     }
 
     private void productsMenu() {
-        System.out.println("\n-- Products --");
-        System.out.println("1. Register video game");
-        System.out.println("2. Register console");
-        System.out.println("3. List products");
-        System.out.print("Choose an option: ");
+        System.out.println("\n-- Productos --");
+        System.out.println("1. Registrar videojuego");
+        System.out.println("2. Registrar consola");
+        System.out.println("3. Listar productos");
+        System.out.print("Elija una opcion: ");
         switch (readInt()) {
-            case 1 -> registerVideoGame();
-            case 2 -> registerConsole();
-            case 3 -> listProducts();
-            default -> System.out.println("Invalid option.");
+            case 1 -> execute(this::registerVideoGame);
+            case 2 -> execute(this::registerConsole);
+            case 3 -> execute(this::listProducts);
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerVideoGame() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Title: "); String title = scanner.nextLine();
-        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Titulo: "); String title = scanner.nextLine();
+        System.out.print("Precio: "); double price = Double.parseDouble(scanner.nextLine());
         System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
-        System.out.print("Platform: "); String platform = scanner.nextLine();
-        System.out.print("Genre: "); String genre = scanner.nextLine();
-        System.out.print("Age rating: "); String ageRating = scanner.nextLine();
+        System.out.print("Plataforma: "); String platform = scanner.nextLine();
+        System.out.print("Genero: "); String genre = scanner.nextLine();
+        System.out.print("Clasificacion por edad: "); String ageRating = scanner.nextLine();
         VideoGame videoGame = productService.registerVideoGame(id, title, price, stock, platform, genre, ageRating);
-        System.out.println("Registered: " + videoGame.getDescription());
+        System.out.println("Registrado: " + videoGame.getDescription());
     }
 
     private void registerConsole() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Title: "); String title = scanner.nextLine();
-        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Titulo: "); String title = scanner.nextLine();
+        System.out.print("Precio: "); double price = Double.parseDouble(scanner.nextLine());
         System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
-        System.out.print("Brand: "); String brand = scanner.nextLine();
-        System.out.print("Model: "); String model = scanner.nextLine();
-        System.out.print("Generation: "); String generation = scanner.nextLine();
+        System.out.print("Marca: "); String brand = scanner.nextLine();
+        System.out.print("Modelo: "); String model = scanner.nextLine();
+        System.out.print("Generacion: "); String generation = scanner.nextLine();
         Console console = productService.registerConsole(id, title, price, stock, brand, model, generation);
-        System.out.println("Registered: " + console.getDescription());
+        System.out.println("Registrado: " + console.getDescription());
     }
 
     private void listProducts() {
@@ -132,26 +138,26 @@ public class ConsoleMenu {
     }
 
     private void peopleMenu() {
-        System.out.println("\n-- People --");
-        System.out.println("1. Register client");
-        System.out.println("2. List clients");
-        System.out.println("3. List sellers");
-        System.out.print("Choose an option: ");
+        System.out.println("\n-- Personas --");
+        System.out.println("1. Registrar cliente");
+        System.out.println("2. Listar clientes");
+        System.out.println("3. Listar vendedores");
+        System.out.print("Elija una opcion: ");
         switch (readInt()) {
-            case 1 -> registerClient();
-            case 2 -> listClients();
-            case 3 -> listSellers();
-            default -> System.out.println("Invalid option.");
+            case 1 -> execute(this::registerClient);
+            case 2 -> execute(this::listClients);
+            case 3 -> execute(this::listSellers);
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerClient() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Name: "); String name = scanner.nextLine();
-        System.out.print("Phone: "); String phone = scanner.nextLine();
-        System.out.print("Email: "); String email = scanner.nextLine();
+        System.out.print("Nombre: "); String name = scanner.nextLine();
+        System.out.print("Telefono: "); String phone = scanner.nextLine();
+        System.out.print("Correo: "); String email = scanner.nextLine();
         Client client = personService.registerClient(id, name, phone, email);
-        System.out.println("Registered: " + client.getRoleDescription());
+        System.out.println("Registrado: " + client.getRoleDescription());
     }
 
     private void listClients() {
@@ -167,44 +173,51 @@ public class ConsoleMenu {
     }
 
     private void salesMenu() {
-        System.out.println("\n-- Sales --");
-        System.out.println("1. Register sale");
-        System.out.println("2. List all sales");
-        System.out.println("3. List sales by client");
-        System.out.println("4. List sales by seller");
-        System.out.print("Choose an option: ");
+        System.out.println("\n-- Ventas --");
+        System.out.println("1. Registrar venta");
+        System.out.println("2. Listar todas las ventas");
+        System.out.println("3. Listar ventas por cliente");
+        System.out.println("4. Listar ventas por vendedor");
+        System.out.print("Elija una opcion: ");
         switch (readInt()) {
-            case 1 -> registerSale();
-            case 2 -> printSales(saleService.listSales());
-            case 3 -> { System.out.print("Client id: "); printSales(saleService.listSalesByClient(scanner.nextLine())); }
-            case 4 -> { System.out.print("Seller id: "); printSales(saleService.listSalesBySeller(scanner.nextLine())); }
-            default -> System.out.println("Invalid option.");
+            case 1 -> execute(this::registerSale);
+            case 2 -> execute(() -> printSales(saleService.listSales()));
+            case 3 -> execute(() -> {
+                System.out.print("Id del cliente: ");
+                printSales(saleService.listSalesByClient(scanner.nextLine()));
+            });
+            case 4 -> execute(() -> {
+                System.out.print("Id del vendedor: ");
+                printSales(saleService.listSalesBySeller(scanner.nextLine()));
+            });
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerSale() {
-        System.out.print("Sale id: "); String id = scanner.nextLine();
-        System.out.print("Client id: "); String clientId = scanner.nextLine();
-        System.out.print("Seller id: "); String sellerId = scanner.nextLine();
-        System.out.print("How many products? "); int count = Integer.parseInt(scanner.nextLine());
+        System.out.print("Id de la venta: "); String id = scanner.nextLine();
+        System.out.print("Id del cliente: "); String clientId = scanner.nextLine();
+        System.out.print("Id del vendedor: "); String sellerId = scanner.nextLine();
+        System.out.print("Cuantos productos? "); int count = Integer.parseInt(scanner.nextLine());
         List<String> productIds = new ArrayList<>();
         List<String> productIdsWithExtendedWarranty = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            System.out.print("Product id #" + (i + 1) + ": ");
+            System.out.print("Id del producto #" + (i + 1) + ": ");
             String productId = scanner.nextLine();
             productIds.add(productId);
             Product product = productService.findById(productId);
             if (product instanceof Console) {
-                System.out.print("Extended warranty for " + product.getTitle() + "? (y/n): ");
-                if (scanner.nextLine().equalsIgnoreCase("y")) {
+                System.out.print("Garantia extendida para " + product.getTitle() + "? (s/n): ");
+                String answer = scanner.nextLine();
+                if (answer.equalsIgnoreCase("s") || answer.equalsIgnoreCase("y")) {
                     productIdsWithExtendedWarranty.add(productId);
                 }
             }
         }
-        System.out.print("How many accessories? "); int accessoryCount = Integer.parseInt(scanner.nextLine());
+        System.out.print("Cuantos accesorios? "); int accessoryCount = Integer.parseInt(scanner.nextLine());
         List<String> accessoryIds = new ArrayList<>();
         for (int i = 0; i < accessoryCount; i++) {
-            System.out.print("Accessory id #" + (i + 1) + ": ");
+            System.out.print("Id del accesorio #" + (i + 1) + ": ");
             accessoryIds.add(scanner.nextLine());
         }
         Sale sale = saleService.registerSale(id, clientId, sellerId, productIds, accessoryIds,
@@ -220,56 +233,56 @@ public class ConsoleMenu {
     }
 
     private void accessoriesMenu() {
-        System.out.println("\n-- Accessories --");
-        System.out.println("1. Register a new controller");
-        System.out.println("2. Register a new cable");
-        System.out.println("3. Register a new memory");
-        System.out.println("4. List all accessories");
-        System.out.println("5. List accessories by type");
-        System.out.println("6. Find accessories compatible with a console");
-        System.out.println("0. Back");
+        System.out.println("\n-- Accesorios --");
+        System.out.println("1. Registrar un control");
+        System.out.println("2. Registrar un cable");
+        System.out.println("3. Registrar una memoria");
+        System.out.println("4. Listar todos los accesorios");
+        System.out.println("5. Listar accesorios por tipo");
+        System.out.println("6. Buscar accesorios compatibles con una consola");
+        System.out.println("0. Volver");
         switch (readInt()) {
-            case 1 -> registerControllerFlow();
-            case 2 -> registerCableFlow();
-            case 3 -> registerMemoryFlow();
-            case 4 -> listAllAccessoriesFlow();
-            case 5 -> listAccessoriesByTypeFlow();
-            case 6 -> listCompatibleAccessoriesFlow();
+            case 1 -> execute(this::registerControllerFlow);
+            case 2 -> execute(this::registerCableFlow);
+            case 3 -> execute(this::registerMemoryFlow);
+            case 4 -> execute(this::listAllAccessoriesFlow);
+            case 5 -> execute(this::listAccessoriesByTypeFlow);
+            case 6 -> execute(this::listCompatibleAccessoriesFlow);
             case 0 -> { /* back */ }
-            default -> System.out.println("Invalid option.");
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerControllerFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Title: "); String title = scanner.nextLine();
-        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Titulo: "); String title = scanner.nextLine();
+        System.out.print("Precio: "); double price = Double.parseDouble(scanner.nextLine());
         System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
-        System.out.print("Connection type: "); String connectionType = scanner.nextLine();
+        System.out.print("Tipo de conexion: "); String connectionType = scanner.nextLine();
         Controller controller = accessoryService.registerController(id, title, price, stock, connectionType);
-        System.out.println("Registered: " + controller.getDescription());
+        System.out.println("Registrado: " + controller.getDescription());
     }
 
     private void registerCableFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Title: "); String title = scanner.nextLine();
-        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Titulo: "); String title = scanner.nextLine();
+        System.out.print("Precio: "); double price = Double.parseDouble(scanner.nextLine());
         System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
-        System.out.print("Length in meters: "); double lengthInMeters = Double.parseDouble(scanner.nextLine());
-        System.out.print("Connector type: "); String connectorType = scanner.nextLine();
+        System.out.print("Longitud en metros: "); double lengthInMeters = Double.parseDouble(scanner.nextLine());
+        System.out.print("Tipo de conector: "); String connectorType = scanner.nextLine();
         Cable cable = accessoryService.registerCable(id, title, price, stock, lengthInMeters, connectorType);
-        System.out.println("Registered: " + cable.getDescription());
+        System.out.println("Registrado: " + cable.getDescription());
     }
 
     private void registerMemoryFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Title: "); String title = scanner.nextLine();
-        System.out.print("Price: "); double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Titulo: "); String title = scanner.nextLine();
+        System.out.print("Precio: "); double price = Double.parseDouble(scanner.nextLine());
         System.out.print("Stock: "); int stock = Integer.parseInt(scanner.nextLine());
-        System.out.print("Capacity in gigabytes: "); int capacityInGigabytes = Integer.parseInt(scanner.nextLine());
-        System.out.print("Memory type: "); String memoryType = scanner.nextLine();
+        System.out.print("Capacidad en gigabytes: "); int capacityInGigabytes = Integer.parseInt(scanner.nextLine());
+        System.out.print("Tipo de memoria: "); String memoryType = scanner.nextLine();
         Memory memory = accessoryService.registerMemory(id, title, price, stock, capacityInGigabytes, memoryType);
-        System.out.println("Registered: " + memory.getDescription());
+        System.out.println("Registrado: " + memory.getDescription());
     }
 
     private void listAllAccessoriesFlow() {
@@ -279,7 +292,7 @@ public class ConsoleMenu {
     }
 
     private void listAccessoriesByTypeFlow() {
-        System.out.print("Type (CONTROLLER, CABLE, MEMORY): ");
+        System.out.print("Tipo (CONTROLLER, CABLE, MEMORY): ");
         String type = scanner.nextLine().toUpperCase();
         for (Accessory accessory : accessoryService.listAllAccessories()) {
             boolean matches = switch (type) {
@@ -295,61 +308,61 @@ public class ConsoleMenu {
     }
 
     private void listCompatibleAccessoriesFlow() {
-        System.out.print("Console id: "); String consoleId = scanner.nextLine();
+        System.out.print("Id de la consola: "); String consoleId = scanner.nextLine();
         for (Accessory accessory : accessoryService.findAccessoriesCompatibleWith(consoleId)) {
             System.out.println(accessory.getDescription());
         }
     }
 
     private void promotionsMenu() {
-        System.out.println("\n-- Promotions --");
-        System.out.println("1. Register a percentage discount");
-        System.out.println("2. Register a category discount");
-        System.out.println("3. Register a bulk purchase discount");
-        System.out.println("4. List all promotions");
-        System.out.println("5. List active promotions");
-        System.out.println("0. Back");
+        System.out.println("\n-- Promociones --");
+        System.out.println("1. Registrar descuento porcentual");
+        System.out.println("2. Registrar descuento por categoria");
+        System.out.println("3. Registrar descuento por volumen");
+        System.out.println("4. Listar todas las promociones");
+        System.out.println("5. Listar promociones vigentes");
+        System.out.println("0. Volver");
         switch (readInt()) {
-            case 1 -> registerPercentageDiscountFlow();
-            case 2 -> registerCategoryDiscountFlow();
-            case 3 -> registerBulkPurchaseDiscountFlow();
-            case 4 -> listAllPromotionsFlow();
-            case 5 -> listActivePromotionsFlow();
+            case 1 -> execute(this::registerPercentageDiscountFlow);
+            case 2 -> execute(this::registerCategoryDiscountFlow);
+            case 3 -> execute(this::registerBulkPurchaseDiscountFlow);
+            case 4 -> execute(this::listAllPromotionsFlow);
+            case 5 -> execute(this::listActivePromotionsFlow);
             case 0 -> { /* back */ }
-            default -> System.out.println("Invalid option.");
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerPercentageDiscountFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Name: "); String name = scanner.nextLine();
-        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
+        System.out.print("Nombre: "); String name = scanner.nextLine();
+        System.out.print("Fecha de inicio (AAAA-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Fecha de fin (AAAA-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Porcentaje: "); double percentage = Double.parseDouble(scanner.nextLine());
         PercentageDiscount promo = promotionService.registerPercentageDiscount(id, name, startDate, endDate, percentage);
-        System.out.println("Registered: " + promo.getName());
+        System.out.println("Registrado: " + promo.getName());
     }
 
     private void registerCategoryDiscountFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Name: "); String name = scanner.nextLine();
-        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
-        System.out.print("Target category (VIDEOGAME, CONSOLE, ACCESSORY): "); String targetCategory = scanner.nextLine().toUpperCase();
+        System.out.print("Nombre: "); String name = scanner.nextLine();
+        System.out.print("Fecha de inicio (AAAA-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Fecha de fin (AAAA-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Porcentaje: "); double percentage = Double.parseDouble(scanner.nextLine());
+        System.out.print("Categoria (VIDEOGAME, CONSOLE, ACCESSORY): "); String targetCategory = scanner.nextLine().toUpperCase();
         CategoryDiscount promo = promotionService.registerCategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
-        System.out.println("Registered: " + promo.getName());
+        System.out.println("Registrado: " + promo.getName());
     }
 
     private void registerBulkPurchaseDiscountFlow() {
         System.out.print("Id: "); String id = scanner.nextLine();
-        System.out.print("Name: "); String name = scanner.nextLine();
-        System.out.print("Start date (YYYY-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("End date (YYYY-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
-        System.out.print("Minimum quantity: "); int minimumQuantity = Integer.parseInt(scanner.nextLine());
-        System.out.print("Percentage: "); double percentage = Double.parseDouble(scanner.nextLine());
+        System.out.print("Nombre: "); String name = scanner.nextLine();
+        System.out.print("Fecha de inicio (AAAA-MM-DD): "); LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Fecha de fin (AAAA-MM-DD): "); LocalDate endDate = LocalDate.parse(scanner.nextLine());
+        System.out.print("Cantidad minima: "); int minimumQuantity = Integer.parseInt(scanner.nextLine());
+        System.out.print("Porcentaje: "); double percentage = Double.parseDouble(scanner.nextLine());
         BulkPurchaseDiscount promo = promotionService.registerBulkPurchaseDiscount(id, name, startDate, endDate, minimumQuantity, percentage);
-        System.out.println("Registered: " + promo.getName());
+        System.out.println("Registrado: " + promo.getName());
     }
 
     private void listAllPromotionsFlow() {
@@ -365,30 +378,30 @@ public class ConsoleMenu {
     }
 
     private void warrantiesMenu() {
-        System.out.println("\n-- Warranties --");
-        System.out.println("1. Find warranty by product and sale");
-        System.out.println("2. List all warranties");
-        System.out.println("3. List active warranties");
-        System.out.println("4. List warranties expiring soon");
-        System.out.println("0. Back");
+        System.out.println("\n-- Garantias --");
+        System.out.println("1. Buscar garantia por producto y venta");
+        System.out.println("2. Listar todas las garantias");
+        System.out.println("3. Listar garantias activas");
+        System.out.println("4. Listar garantias proximas a vencer");
+        System.out.println("0. Volver");
         switch (readInt()) {
-            case 1 -> findWarrantyByProductFlow();
-            case 2 -> listAllWarrantiesFlow();
-            case 3 -> listActiveWarrantiesFlow();
-            case 4 -> listWarrantiesExpiringSoonFlow();
+            case 1 -> execute(this::findWarrantyByProductFlow);
+            case 2 -> execute(this::listAllWarrantiesFlow);
+            case 3 -> execute(this::listActiveWarrantiesFlow);
+            case 4 -> execute(this::listWarrantiesExpiringSoonFlow);
             case 0 -> { /* back */ }
-            default -> System.out.println("Invalid option.");
+            default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void findWarrantyByProductFlow() {
-        System.out.print("Product id: "); String productId = scanner.nextLine();
-        System.out.print("Sale id: "); String saleId = scanner.nextLine();
+        System.out.print("Id del producto: "); String productId = scanner.nextLine();
+        System.out.print("Id de la venta: "); String saleId = scanner.nextLine();
         Warranty warranty = warrantyService.findWarrantyByProduct(productId, saleId);
         if (warranty != null) {
             System.out.println(warranty.generateWarrantyCertificate());
         } else {
-            System.out.println("No warranty found for that product and sale.");
+            System.out.println("No se encontro garantia para ese producto y venta.");
         }
     }
 
@@ -405,7 +418,7 @@ public class ConsoleMenu {
     }
 
     private void listWarrantiesExpiringSoonFlow() {
-        System.out.print("Days ahead: "); int daysAhead = Integer.parseInt(scanner.nextLine());
+        System.out.print("Dias hacia adelante: "); int daysAhead = Integer.parseInt(scanner.nextLine());
         for (Warranty warranty : warrantyService.listWarrantiesExpiringSoon(daysAhead)) {
             System.out.println(warranty.generateWarrantyCertificate());
         }
@@ -425,34 +438,28 @@ public class ConsoleMenu {
         System.out.println("0. Volver");
         System.out.print("Elija una opcion: ");
         switch (readInt()) {
-            case 1 -> registerReturnFlow();
-            case 2 -> listAllReturnsFlow();
-            case 3 -> listReturnsByCustomerFlow();
-            case 4 -> listReturnsBySaleFlow();
-            case 5 -> showMonthlyBalanceFlow();
+            case 1 -> execute(this::registerReturnFlow);
+            case 2 -> execute(this::listAllReturnsFlow);
+            case 3 -> execute(this::listReturnsByCustomerFlow);
+            case 4 -> execute(this::listReturnsBySaleFlow);
+            case 5 -> execute(this::showMonthlyBalanceFlow);
             case 0 -> { /* back */ }
             default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerReturnFlow() {
-        try {
-            System.out.print("Id de la venta: "); String saleId = scanner.nextLine();
-            System.out.print("Cuantos productos desea devolver? ");
-            int count = Integer.parseInt(scanner.nextLine());
-            List<String> productIds = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-                System.out.print("Id del producto #" + (i + 1) + ": ");
-                productIds.add(scanner.nextLine());
-            }
-            System.out.print("Motivo de la devolucion: "); String reason = scanner.nextLine();
-            Return returnItem = returnService.registerReturn(saleId, productIds, reason);
-            System.out.println(returnItem.generateReturnReceipt());
-        } catch (NumberFormatException e) {
-            System.out.println("Cantidad invalida. Debe ingresar un numero entero.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("No se pudo registrar la devolucion: " + e.getMessage());
+        System.out.print("Id de la venta: "); String saleId = scanner.nextLine();
+        System.out.print("Cuantos productos desea devolver? ");
+        int count = Integer.parseInt(scanner.nextLine());
+        List<String> productIds = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            System.out.print("Id del producto #" + (i + 1) + ": ");
+            productIds.add(scanner.nextLine());
         }
+        System.out.print("Motivo de la devolucion: "); String reason = scanner.nextLine();
+        Return returnItem = returnService.registerReturn(saleId, productIds, reason);
+        System.out.println(returnItem.generateReturnReceipt());
     }
 
     private void listAllReturnsFlow() {
@@ -485,21 +492,44 @@ public class ConsoleMenu {
     }
 
     private void showMonthlyBalanceFlow() {
+        System.out.print("Mes (1-12): "); int month = Integer.parseInt(scanner.nextLine());
+        System.out.print("Anio: "); int year = Integer.parseInt(scanner.nextLine());
+        if (month < 1 || month > 12) {
+            System.out.println("Mes invalido. Debe estar entre 1 y 12.");
+            return;
+        }
+        double sales = returnService.calculateMonthlySales(month, year);
+        double returns = returnService.calculateMonthlyReturns(month, year);
+        double balance = returnService.generateMonthlyBalance(month, year);
+        System.out.println("Total de ventas del mes: " + sales);
+        System.out.println("Total de devoluciones del mes: " + returns);
+        System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
+    }
+
+    /**
+     * Runs one menu operation and translates every failure into a Spanish
+     * message, so that an error never stops the application. The catch
+     * blocks go from the most specific exception to the most general one.
+     *
+     * @param operation the menu operation to run
+     */
+    private void execute(Runnable operation) {
         try {
-            System.out.print("Mes (1-12): "); int month = Integer.parseInt(scanner.nextLine());
-            System.out.print("Anio: "); int year = Integer.parseInt(scanner.nextLine());
-            if (month < 1 || month > 12) {
-                System.out.println("Mes invalido. Debe estar entre 1 y 12.");
-                return;
-            }
-            double sales = returnService.calculateMonthlySales(month, year);
-            double returns = returnService.calculateMonthlyReturns(month, year);
-            double balance = returnService.generateMonthlyBalance(month, year);
-            System.out.println("Total de ventas del mes: " + sales);
-            System.out.println("Total de devoluciones del mes: " + returns);
-            System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
+            operation.run();
+        } catch (ResourceNotFoundException e) {
+            System.out.println("[No encontrado] " + e.getMessage());
+        } catch (BusinessRuleException e) {
+            System.out.println("[Operacion no permitida] " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("[Dato invalido] " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("[Error de almacenamiento] " + e.getMessage());
+        } catch (GameZoneException e) {
+            System.out.println("[Error] " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("Valor invalido. Debe ingresar numeros enteros.");
+            System.out.println("[Dato invalido] Debe ingresar un numero valido.");
+        } catch (DateTimeParseException e) {
+            System.out.println("[Dato invalido] La fecha debe tener el formato AAAA-MM-DD.");
         }
     }
 

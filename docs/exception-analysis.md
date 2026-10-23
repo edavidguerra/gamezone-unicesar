@@ -137,3 +137,76 @@ an exception, and no `Sale` object is ever created. If the validation
 happened after construction, an incomplete or invalid `Sale` would already
 exist in memory with no further use, since it could not be safely saved or
 processed.
+
+## Question 4: Preserving external behaviour of the 10 menu operations
+
+The ten original operations are the ones of the first three submenus:
+register video game, register console and list products; register client,
+list clients and list sellers; register sale, list all sales, list sales by
+client and list sales by seller. The exception layer must not change what
+the user sees when these operations succeed.
+
+The strategy has three parts. First, the validators only reject what the
+system already rejected before: a missing client or seller, a product that
+does not exist, insufficient stock, a duplicated identifier or a sale with
+no products. They throw a typed exception where the old code threw
+`IllegalArgumentException` or returned `null`, so the happy path runs the
+same instructions in the same order. Second, the services keep their public
+signatures (names, parameters and return types), so `ConsoleMenu` calls them
+exactly as before and no caller had to change. Third, the only visible
+difference is in the error path: a failure now prints a Spanish message with
+its category (for example `[No encontrado]`) and returns to the menu, where
+before it ended the program with a stack trace.
+
+The check is a manual test run before and after the change, on a copy of
+the `data/` folder so that both runs start from the same files. Each of the
+ten operations is executed with fixed inputs (for example video game `VG90`,
+console `CO90`, client `C90` and sale `V90` with both products and an
+extended warranty) and the printed output is compared line by line. The same
+run then covers five error cases: a duplicated client, a sale with an
+unknown product, a negative price, text where a number is expected and a
+product without stock. The results of the successful operations (registered
+descriptions, listings and the sale receipt) were identical in both runs;
+only the menu labels changed, because they were translated to Spanish in
+the same requirement. The error cases changed from a crash to a message,
+which is the goal of this requirement. This run is also recorded as the baseline for
+the GRASP and SOLID refactors.
+
+## Question 5: Catch structure in ConsoleMenu
+
+`ConsoleMenu` handles every failure in one private method,
+`execute(Runnable operation)`. Each submenu option is passed to it, for
+example `case 1 -> execute(this::registerVideoGame);`, so the try/catch is
+written once instead of being repeated in more than thirty flows.
+
+Inside `execute` the catch blocks form a cascade from the most specific type
+to the most general one:
+
+1. `ResourceNotFoundException` prints `[No encontrado]`.
+2. `BusinessRuleException` prints `[Operacion no permitida]`.
+3. `InvalidDataException` prints `[Dato invalido]`.
+4. `PersistenceException` prints `[Error de almacenamiento]`.
+5. `GameZoneException` prints `[Error]` for any subclass added later.
+6. `NumberFormatException` and `DateTimeParseException` print a message
+   about the expected number or date format.
+
+The order is required by Java: if `GameZoneException` came first, the
+specific blocks below it would be unreachable and the code would not
+compile. It is also what makes the messages clear, because each category
+gets its own prefix and the user can tell a missing record from a rule
+violation or a storage problem. The four subclasses already carry a Spanish
+message, so the menu only adds the prefix.
+
+The last two blocks are separate because those exceptions do not come from
+the business layers. They are thrown while `ConsoleMenu` itself converts
+the typed text with `Integer.parseInt`, `Double.parseDouble` or
+`LocalDate.parse`, so they are input errors of the console, not failures of
+a service. The method never catches `Exception` or `RuntimeException`:
+doing so would also hide programming errors such as a
+`NullPointerException`, which should stay visible while the system is being
+developed.
+
+Errors raised while the application starts (for example a data file that
+cannot be read while the services load their data) happen before the menu
+exists, so `Main` wraps the start-up in a single `catch (GameZoneException e)`
+and prints a Spanish message instead of a stack trace.

@@ -116,7 +116,7 @@ public class ProductService {
     public void restoreStock(String id, int quantity) {
         Product product = findById(id);
         if (product != null) {
-            product.setStock(product.getStock() + quantity);
+            product.increaseStock(quantity);
             productRepository.saveAll(products);
         }
     }

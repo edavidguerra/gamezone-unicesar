@@ -42,6 +42,12 @@ One row per refactor commit, added in the same commit as the change.
 
 | ID | Commit | Files | Change | Non-regression check |
 |---|---|---|---|---|
+| V-01 | `239c21c` | Sale, SaleService | Added `Sale.calculateFinalTotal()` (subtotal minus `discountAmount` plus `extendedWarrantyCost`). `registerSale` no longer keeps local `subtotal`, `discount` and `finalTotal` variables; it calls `sale.setFinalTotal(sale.calculateFinalTotal())` | Operations 1 to 10: OK. Receipt still shows `Total a pagar: 2950000.0` |
+| V-02 | `0b4c0de` | SaleService | `registerSale` replaced `item instanceof Console` with `item.isWarrantyEligible()` and removed the unused `Console` import | Operations 1 to 10: OK. PS5 still gets the basic and extended warranty |
+| V-03 | `989f294` | ConsoleMenu | `registerSale` asks for the extended warranty when `product != null && product.isWarrantyEligible()` instead of `product instanceof Console` | Operations 1 to 10 and E2, E5: OK. The `(s/n)` prompt still appears only for consoles |
+| V-04 | `50d6a86` | ConsoleMenu | `listAccessoriesByTypeFlow` calls `accessoryService.listAccessoriesByType(type)` (V-23) and only prints the result; the `switch` with `instanceof Controller/Cable/Memory` was removed | Operations 1 to 10 and list accessories by type `CABLE`: OK. An unknown type now shows `[Dato invalido] El campo tipo no es valido: debe ser CONTROLLER, CABLE o MEMORY.` instead of an empty list |
+| V-05 | - | SaleService, WarrantyService, Main | Deferred: the cycle is removed in the SOLID phase with the `SaleLookup` interface (V-32) | Not applicable |
+| V-06 | - | SaleService, SaleRepository | Deferred: `SaleRepository` becomes an interface in the SOLID phase (V-31) | Not applicable |
 | V-10 | `71c0bca` | Product, VideoGame, Accessory | Added abstract `getCategory()` to `Product`; `VideoGame` returns `VIDEOGAME` and `Accessory` `ACCESSORY` (`Console` is completed in the V-11 commit) | Operations 1, 2, 3 and 7: OK |
 | V-10 | `0170d28` | CategoryDiscount | `belongsToTargetCategory` replaced its three `instanceof` checks with `product.getCategory().equals(targetCategory)` | Operations 1, 2, 3 and 7: OK |
 | V-11 | `2faab25` | Product, Console | Added `isWarrantyEligible()` (false in `Product`, true in `Console`) and `Console.getCategory()` returning `CONSOLE`. Callers are changed by V-02, V-03 and V-21 | Operations 1, 2, 3 and 7: OK |
@@ -59,3 +65,14 @@ One row per refactor commit, added in the same commit as the change.
 ## Corrections
 
 Changes made after a refactor broke a baseline case, with the cause and the fix.
+
+## Final non-regression check
+
+Run on `feature/grasp-refactor` after the leader commits (developer 1, developer 2 and leader
+corrections applied), with a copy of `data/` and the same inputs as the baseline.
+
+| Cases | Result |
+|---|---|
+| Operations 1 to 10 | Same output as the baseline. Sale listings still print the subtotal (`Total: 2700000.0`), as recorded in the baseline note; changing it is a behavior change, not a GRASP refactor |
+| E1 to E5 | Same messages as the baseline |
+| `mvn clean compile` | BUILD SUCCESS, no warnings |

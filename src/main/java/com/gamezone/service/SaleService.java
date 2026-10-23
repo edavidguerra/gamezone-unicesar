@@ -1,7 +1,6 @@
 package com.gamezone.service;
 
 import com.gamezone.model.Client;
-import com.gamezone.model.Console;
 import com.gamezone.model.ExtendedWarranty;
 import com.gamezone.model.Product;
 import com.gamezone.model.Promotion;
@@ -90,7 +89,7 @@ public class SaleService {
 
         double warrantyCost = 0.0;
         for (Product item : soldProducts) {
-            if (item instanceof Console) {
+            if (item.isWarrantyEligible()) {
                 warrantyService.assignBasicWarranty(item, sale, LocalDate.now());
                 if (productIdsWithExtendedWarranty != null
                         && productIdsWithExtendedWarranty.contains(item.getId())) {

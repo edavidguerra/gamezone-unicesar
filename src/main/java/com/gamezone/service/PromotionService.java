@@ -1,5 +1,6 @@
 package com.gamezone.service;
 
+import com.gamezone.exceptions.InvalidDataException;
 import com.gamezone.model.*;
 import com.gamezone.persistence.PromotionRepository;
 
@@ -31,10 +32,10 @@ public class PromotionService {
 
     public CategoryDiscount registerCategoryDiscount(String id, String name,
             LocalDate startDate, LocalDate endDate, double percentage, String targetCategory) {
-       if (!targetCategory.equals("VIDEOGAME") && !targetCategory.equals("CONSOLE")
-        && !targetCategory.equals("ACCESSORY")) {
-    throw new IllegalArgumentException("Categoria de descuento no valida: " + targetCategory);
-}
+        if (!targetCategory.equals("VIDEOGAME") && !targetCategory.equals("CONSOLE")
+                && !targetCategory.equals("ACCESSORY")) {
+            throw new InvalidDataException("categoria", "debe ser VIDEOGAME, CONSOLE o ACCESSORY");
+        }
         CategoryDiscount promo = new CategoryDiscount(id, name, startDate, endDate,
                 percentage, targetCategory);
         promotions.add(promo);

@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Client;
 import com.gamezone.model.Seller;
 
@@ -32,7 +33,8 @@ public class PersonRepository {
                         + client.getPhone() + "|" + client.getEmail());
             }
         } catch (IOException e) {
-            System.out.println("Error saving clients: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + CLIENTS_FILE
+                    + " (operacion: guardado de clientes): " + e.getMessage(), e);
         }
     }
         /**
@@ -56,7 +58,8 @@ public class PersonRepository {
                 clients.add(new Client(parts[0], parts[1], parts[2], parts[3]));
             }
         } catch (IOException e) {
-            System.out.println("Error loading clients: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + CLIENTS_FILE
+                    + " (operacion: carga de clientes): " + e.getMessage(), e);
         }
         return clients;
     }
@@ -73,7 +76,8 @@ public class PersonRepository {
                         + seller.getShift());
             }
         } catch (IOException e) {
-            System.out.println("Error saving sellers: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + SELLERS_FILE
+                    + " (operacion: guardado de vendedores): " + e.getMessage(), e);
         }
     }
         /**
@@ -97,7 +101,8 @@ public class PersonRepository {
                 sellers.add(new Seller(parts[0], parts[1], parts[2], parts[3], parts[4]));
             }
         } catch (IOException e) {
-            System.out.println("Error loading sellers: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + SELLERS_FILE
+                    + " (operacion: carga de vendedores): " + e.getMessage(), e);
         }
         return sellers;
     }

@@ -50,9 +50,53 @@ one actor or one kind of change.
 
 Owner: Developer 1.
 
+**What it says.** A class should be open for extension and closed for modification: new
+behavior is added with new code, not by editing code that already works.
+
+**Where GameZone follows it.**
+
+- `Promotion.calculateDiscount` is abstract. `PromotionService.findBestPromotionFor` and
+  `SaleService.registerSale` work with any promotion, so a new kind of discount is a new
+  subclass and those services do not change.
+- After the GRASP refactor the behaviors that change with the product type are polymorphic:
+  `getCategory()` (used by `CategoryDiscount`), `isWarrantyEligible()` (used by `SaleService`,
+  `ReturnService` and `ConsoleMenu`), `getAccessoryType()` and `Warranty.getTypeCode()`. A new
+  subclass implements them and no caller is edited.
+
+**Violations.**
+
+- **V-40** `ProductRepository.saveAll` and `loadAll` choose the line format with `instanceof`
+  and `type.equals(...)`. It was rejected: the repository is the only class that knows the
+  file format, so a new product type must be taught to it in one place, and moving that
+  mapping into `Product` would make the model depend on persistence (same reason as GRASP
+  V-15).
+
 ## Liskov Substitution Principle (LSP)
 
 Owner: Developer 1.
+
+**What it says.** Objects of a subclass must be usable wherever the base class is expected,
+without breaking what the base class promises.
+
+**Where GameZone follows it.**
+
+- Every `Product` subclass (`VideoGame`, `Console` and the three accessories) returns a valid
+  description and category, and none throws new exceptions or changes the stock methods, so
+  `Sale`, `CategoryDiscount` and the services treat them all as `Product`.
+- Every `Promotion` returns a discount between 0 and the subtotal, so
+  `findBestPromotionFor` can compare any of them with the same rule.
+- `BasicWarranty` and `ExtendedWarranty` return a positive duration and a non-negative cost.
+- The exception subclasses only fix their message and code, so `ConsoleMenu.execute` can catch
+  any of them as `GameZoneException`.
+
+**Violations.**
+
+- **V-42** The `Warranty` constructor computed `endDate` by calling the abstract method
+  `getDurationInMonths()`, which runs before the subclass constructor. It works today because
+  both durations are constants, but a subclass that computed its duration from its own fields
+  would get a wrong end date. The fix removes the `endDate` field and its unused setter:
+  `getEndDate()` computes `startDate.plusMonths(getDurationInMonths())` when it is called, and
+  `isActive` uses it.
 
 ## Interface Segregation Principle (ISP)
 

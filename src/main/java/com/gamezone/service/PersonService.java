@@ -2,8 +2,11 @@ package com.gamezone.service;
 
 import com.gamezone.model.Client;
 import com.gamezone.model.Seller;
+import com.gamezone.model.Person;
 import com.gamezone.persistence.PersonRepository;
+import com.gamezone.validation.PersonValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +39,10 @@ public class PersonService {
      * @return the registered client
      */
     public Client registerClient(String id, String name, String phone, String email) {
+        PersonValidator.validatePersonData(id, name, email, phone);
+        List<Person> existing = new ArrayList<>(clients);
+        existing.addAll(sellers);
+        PersonValidator.validateUniquePerson(existing, id);
         Client client = new Client(id, name, phone, email);
         clients.add(client);
         personRepository.saveClients(clients);

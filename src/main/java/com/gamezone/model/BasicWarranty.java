@@ -22,6 +22,11 @@ public class BasicWarranty extends Warranty {
     }
 
     @Override
+    public String getTypeCode() {
+        return "BASIC";
+    }
+
+    @Override
     public double getAdditionalCost() {
         return 0.0;
     }

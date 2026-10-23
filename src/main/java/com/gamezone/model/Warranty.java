@@ -45,6 +45,15 @@ public abstract class Warranty {
 
     public abstract int getDurationInMonths();
     public abstract String getWarrantyType();
+
+    /**
+     * Returns the technical code of the warranty type, used to store it.
+     * Unlike getWarrantyType, it is not shown to the user.
+     *
+     * @return "BASIC" or "EXTENDED"
+     */
+    public abstract String getTypeCode();
+
     public abstract double getAdditionalCost();
 
     /**

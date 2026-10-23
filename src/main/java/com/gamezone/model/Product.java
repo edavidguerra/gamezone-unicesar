@@ -79,4 +79,16 @@ public abstract String getDescription();
      */
 
 public abstract String getCategory();
+
+
+/**
+     * Tells whether the product receives a warranty when it is sold.
+     * Products have no warranty unless a subclass says otherwise.
+     *
+     * @return false by default
+     */
+
+public boolean isWarrantyEligible() {
+return false;
+}
 }

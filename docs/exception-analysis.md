@@ -49,3 +49,55 @@ throws `PersistenceException`, which is unchecked and extends
 problem is not lost. This turns a low-level technical error into a domain
 error with the code `"PERSISTENCE"` and keeps the upper layers independent
 of how data is stored.
+
+## Question 2: Why a custom exception hierarchy
+
+If every failure were an `IllegalArgumentException`, a missing product, an
+invalid value and an unreadable data file would all look the same. The only
+way to tell them apart would be to read the message text, which is fragile:
+rewording a message would silently break the logic. With custom types, the
+type itself says what failed. `ResourceNotFoundException` means a resource of
+some kind (product, client, seller or sale) does not exist, and
+`PersistenceException` means a file could not be read or written. Each one
+also carries an `errorCode` (`"RESOURCE_NOT_FOUND"`, `"PERSISTENCE"`), so the
+caller can react to the category without parsing text.
+
+A common root is the second big advantage. Every error the system throws on
+purpose is a `GameZoneException`, so `ConsoleMenu` can handle all of them with
+one `catch (GameZoneException e)`. Since every subclass is a
+`GameZoneException`, that handler works with any of them and can call
+`getMessage()` and `getErrorCode()` without knowing the concrete class. It
+also separates our own domain errors from unexpected bugs such as
+`NullPointerException`, which should not be hidden behind a friendly message.
+The root is declared `abstract`, so nobody can throw a vague
+`new GameZoneException(...)`; the code is forced to choose a specific type
+that explains what happened.
+
+Several design principles apply:
+
+- **SRP (Single Responsibility).** Each class has one reason to change.
+  `ResourceNotFoundException` only describes a missing resource and builds
+  its own message from `resourceType` and `identifier`.
+  `PersistenceException` only describes storage failures and keeps the
+  original cause. The code that detects the problem, the exception that
+  describes it and the menu that shows it are separate responsibilities.
+- **OCP (Open/Closed).** The hierarchy is open for extension and closed for
+  modification. To add a new error, for example `DuplicateProductException`,
+  I create a new class that extends `GameZoneException` and passes its own
+  code, such as `"DUPLICATE_PRODUCT"`. No existing exception, service or
+  catch block changes, because `ConsoleMenu` already handles the root type.
+- **LSP (Liskov Substitution).** A `ResourceNotFoundException` or a
+  `PersistenceException` can be used anywhere a `GameZoneException` is
+  expected. The handler in `ConsoleMenu` treats them through the parent type
+  and works correctly with both, so the subclasses respect the contract of
+  the root (a message plus an error code).
+- **Encapsulation.** The `errorCode` field is `private final` and exposed
+  only through `getErrorCode()`. It is set once in the constructor and
+  cannot be changed afterwards, so no caller can alter the category of an
+  error that is already in flight. The subclasses also hide the details: the
+  caller of `ResourceNotFoundException` passes only the type and the id, and
+  the class builds the message and picks the code.
+
+In short, a custom hierarchy gives meaningful types, a single safe place to
+catch domain errors and a way to add new errors without touching working
+code. A generic `IllegalArgumentException` offers none of these.

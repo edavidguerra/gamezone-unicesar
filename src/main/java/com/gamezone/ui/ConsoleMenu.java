@@ -437,34 +437,28 @@ public class ConsoleMenu {
         System.out.println("0. Volver");
         System.out.print("Elija una opcion: ");
         switch (readInt()) {
-            case 1 -> registerReturnFlow();
-            case 2 -> listAllReturnsFlow();
-            case 3 -> listReturnsByCustomerFlow();
-            case 4 -> listReturnsBySaleFlow();
-            case 5 -> showMonthlyBalanceFlow();
+            case 1 -> execute(this::registerReturnFlow);
+            case 2 -> execute(this::listAllReturnsFlow);
+            case 3 -> execute(this::listReturnsByCustomerFlow);
+            case 4 -> execute(this::listReturnsBySaleFlow);
+            case 5 -> execute(this::showMonthlyBalanceFlow);
             case 0 -> { /* back */ }
             default -> System.out.println("Opcion invalida.");
         }
     }
 
     private void registerReturnFlow() {
-        try {
-            System.out.print("Id de la venta: "); String saleId = scanner.nextLine();
-            System.out.print("Cuantos productos desea devolver? ");
-            int count = Integer.parseInt(scanner.nextLine());
-            List<String> productIds = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-                System.out.print("Id del producto #" + (i + 1) + ": ");
-                productIds.add(scanner.nextLine());
-            }
-            System.out.print("Motivo de la devolucion: "); String reason = scanner.nextLine();
-            Return returnItem = returnService.registerReturn(saleId, productIds, reason);
-            System.out.println(returnItem.generateReturnReceipt());
-        } catch (NumberFormatException e) {
-            System.out.println("Cantidad invalida. Debe ingresar un numero entero.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("No se pudo registrar la devolucion: " + e.getMessage());
+        System.out.print("Id de la venta: "); String saleId = scanner.nextLine();
+        System.out.print("Cuantos productos desea devolver? ");
+        int count = Integer.parseInt(scanner.nextLine());
+        List<String> productIds = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            System.out.print("Id del producto #" + (i + 1) + ": ");
+            productIds.add(scanner.nextLine());
         }
+        System.out.print("Motivo de la devolucion: "); String reason = scanner.nextLine();
+        Return returnItem = returnService.registerReturn(saleId, productIds, reason);
+        System.out.println(returnItem.generateReturnReceipt());
     }
 
     private void listAllReturnsFlow() {
@@ -497,22 +491,18 @@ public class ConsoleMenu {
     }
 
     private void showMonthlyBalanceFlow() {
-        try {
-            System.out.print("Mes (1-12): "); int month = Integer.parseInt(scanner.nextLine());
-            System.out.print("Anio: "); int year = Integer.parseInt(scanner.nextLine());
-            if (month < 1 || month > 12) {
-                System.out.println("Mes invalido. Debe estar entre 1 y 12.");
-                return;
-            }
-            double sales = returnService.calculateMonthlySales(month, year);
-            double returns = returnService.calculateMonthlyReturns(month, year);
-            double balance = returnService.generateMonthlyBalance(month, year);
-            System.out.println("Total de ventas del mes: " + sales);
-            System.out.println("Total de devoluciones del mes: " + returns);
-            System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
-        } catch (NumberFormatException e) {
-            System.out.println("Valor invalido. Debe ingresar numeros enteros.");
+        System.out.print("Mes (1-12): "); int month = Integer.parseInt(scanner.nextLine());
+        System.out.print("Anio: "); int year = Integer.parseInt(scanner.nextLine());
+        if (month < 1 || month > 12) {
+            System.out.println("Mes invalido. Debe estar entre 1 y 12.");
+            return;
         }
+        double sales = returnService.calculateMonthlySales(month, year);
+        double returns = returnService.calculateMonthlyReturns(month, year);
+        double balance = returnService.generateMonthlyBalance(month, year);
+        System.out.println("Total de ventas del mes: " + sales);
+        System.out.println("Total de devoluciones del mes: " + returns);
+        System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
     }
 
     /**

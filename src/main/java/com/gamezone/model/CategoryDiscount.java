@@ -34,16 +34,7 @@ public class CategoryDiscount extends Promotion {
         return categoryTotal * (percentage / 100.0);
     }
 
-    private boolean belongsToTargetCategory(Product product) {
-        if ("VIDEOGAME".equals(targetCategory)) {
-            return product instanceof VideoGame;
-        }
-        if ("CONSOLE".equals(targetCategory)) {
-            return product instanceof Console;
-        }
-        if ("ACCESSORY".equals(targetCategory)) {
-            return product instanceof Accessory;
-        }
-        return false;
+        private boolean belongsToTargetCategory(Product product) {
+        return product.getCategory().equals(targetCategory);
     }
 }

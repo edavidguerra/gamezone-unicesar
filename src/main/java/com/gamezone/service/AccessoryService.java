@@ -164,7 +164,7 @@ public class AccessoryService {
     public void restoreStock(String accessoryId, int quantity) {
         Accessory accessory = findById(accessoryId);
         if (accessory != null) {
-            accessory.setStock(accessory.getStock() + quantity);
+            accessory.increaseStock(quantity);
             repository.saveAll(accessories);
         }
     }

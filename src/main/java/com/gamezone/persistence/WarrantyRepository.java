@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.BasicWarranty;
 import com.gamezone.model.Warranty;
 
@@ -33,7 +34,8 @@ public class WarrantyRepository {
                         + "|" + warranty.getStartDate());
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar garantias: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + FILE_PATH
+                    + " (operacion: guardado de garantias): " + e.getMessage(), e);
         }
     }
 
@@ -57,7 +59,8 @@ public class WarrantyRepository {
                 records.add(record);
             }
         } catch (IOException e) {
-            System.out.println("Error al leer garantias: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + FILE_PATH
+                    + " (operacion: carga de garantias): " + e.getMessage(), e);
         }
         return records;
     }

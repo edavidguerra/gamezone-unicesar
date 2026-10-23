@@ -117,6 +117,24 @@ references to `Client`, `Seller` and `Product`, but it never calls a repository 
 
 Owner: Developer 2.
 
+**What it says.** Keep the responsibilities of a class focused and closely related, so each
+class has one clear purpose and is easy to understand, reuse and maintain.
+
+**Where GameZone applies it.**
+
+- Services hold business rules and repositories only read and write files. `PersonService`
+  validates through the `validation` package and delegates persistence to `PersonRepository`,
+  and it does nothing else.
+- `Client` and `Seller` only hold the data of a person, and `Person` holds what both share.
+- `AccessoryService` and `PromotionService` manage the list and the rules of their own module
+  and do not touch files or the console.
+
+**Violations.** None found in the people, accessory and promotion modules. One related
+problem was found in a different pattern: `ReturnService` registers returns and also computes
+the monthly sales balance, so it has two reasons to change. It is handled as a Single
+Responsibility change in Requirement 8 (V-56), by moving the balance to
+`MonthlyBalanceService`.
+
 ## Polymorphism
 
 Owner: Developer 1.
@@ -155,6 +173,26 @@ Fabrication, and moving it to the model would make the model depend on the file 
 
 Owner: Developer 2.
 
+**What it says.** When giving a responsibility to a domain class would lower its cohesion or
+raise its coupling, create an artificial class that does not represent a domain concept and
+give the responsibility to it.
+
+**Where GameZone applies it.**
+
+- `PersonRepository`, `AccessoryRepository`, `PromotionRepository`, `ReturnRepository` and
+  `WarrantyRepository` are Pure Fabrications: reading and writing text files is not a concept
+  of the store, and putting it in `Client`, `Accessory` or `Return` would make the model depend
+  on the file format.
+- The classes of the `validation` package, such as `SaleValidator`, group the data checks so
+  the services do not repeat them.
+
+**Violations.** The fabrications themselves are correct. One of them had a coupling problem:
+
+- **V-20** `ReturnRepository` imported `SaleService`, `ProductService` and `AccessoryService`,
+  so the persistence layer depended on the service layer. Fix: `loadAll(List<Sale> sales,
+  List<Product> catalog)` searches in the lists it receives, `ReturnService` passes
+  `saleService.listSales()` and the catalog, and the constructor has no parameters.
+
 ## Indirection
 
 Owner: Technical Leader.
@@ -182,3 +220,27 @@ each other directly.
 ## Protected Variations
 
 Owner: Developer 2.
+
+**What it says.** Identify the points where the system is likely to change and wrap them
+behind a stable interface, so a change there does not affect the rest of the classes.
+
+**Where GameZone applies it.**
+
+- The file format is the main point of variation. Only the repositories know it, so the
+  services and `ConsoleMenu` do not change if the format does.
+- The repositories translate `IOException` into `PersistenceException`, so the callers depend
+  on one exception type and not on `java.io`.
+- Abstract methods such as `Product.getDescription` and `Promotion.calculateDiscount` protect
+  the callers from the type of each object.
+
+**Violations.**
+
+- **V-20** (see Pure Fabrication) also belongs here: a change in a service could break the
+  repository that imported it. It is fixed by the same change.
+- **V-26** `WarrantyService` receives the concrete `SaleService` and `ProductService` but only
+  calls `findById` on each. Deferred to Requirement 8 (V-55): it will depend on `SaleLookup`
+  and `ProductLookup`.
+- **V-57** `PromotionRepository` checks the promotion type with `instanceof` and a `switch`
+  when it reads and writes the file. It was rejected as a violation for the same reason as
+  V-15: the repository is the only class that knows the file format, so that mapping belongs
+  there, and moving it to the model would make the model depend on the file.

@@ -33,6 +33,14 @@ public void setMemoryType(String memoryType) {
     this.memoryType = memoryType;
 }
 
+/**
+ * @return "MEMORY"
+ */
+@Override
+public String getAccessoryType() {
+    return "MEMORY";
+}
+
 @Override
 public String getDescription() {
     return getTitle() + " [Memory] - Price: " + getPrice()

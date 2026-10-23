@@ -62,6 +62,17 @@ this.stock = this.stock - quantity;
 }
 
 /**
+     * Increases the stock by the given quantity, for example when a
+     * return brings units back into inventory.
+     *
+     * @param quantity quantity added back
+     */
+
+public void increaseStock(int quantity) {
+this.stock = this.stock + quantity;
+}
+
+/**
      * Builds a complete description of the product, combining its common
      * attributes with the ones specific to each subclass. Every subclass
      * must provide its own implementation (polymorphism).
@@ -70,4 +81,24 @@ this.stock = this.stock - quantity;
      */
 
 public abstract String getDescription();
+
+/**
+     * Returns the category code of the product, used by promotions that
+     * apply only to one kind of product.
+     *
+     * @return "VIDEOGAME", "CONSOLE" or "ACCESSORY"
+     */
+
+public abstract String getCategory();
+
+/**
+     * Tells whether the product receives a warranty when it is sold.
+     * Products have no warranty unless a subclass says otherwise.
+     *
+     * @return false by default
+     */
+
+public boolean isWarrantyEligible() {
+return false;
+}
 }

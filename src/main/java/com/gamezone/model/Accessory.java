@@ -41,6 +41,24 @@ public abstract class Accessory extends Product {
         return this.compatibleConsoleIds.contains(consoleId);
     }
 
+    /**
+     * Every accessory shares the same category, whatever its type.
+     *
+     * @return "ACCESSORY"
+     */
+    @Override
+    public String getCategory() {
+        return "ACCESSORY";
+    }
+
+    /**
+     * Returns the type code of the accessory, the same token used in the
+     * accessories file.
+     *
+     * @return "CONTROLLER", "CABLE" or "MEMORY"
+     */
+    public abstract String getAccessoryType();
+
     @Override
     public String getDescription() {
         return getTitle() + " [Accessory] - Price: " + getPrice()

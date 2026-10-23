@@ -42,6 +42,12 @@ One row per refactor commit, added in the same commit as the change.
 
 | ID | Commit | Files | Change | Non-regression check |
 |---|---|---|---|---|
+| V-10 | `71c0bca` | Product, VideoGame, Accessory | Added abstract `getCategory()` to `Product`; `VideoGame` returns `VIDEOGAME` and `Accessory` `ACCESSORY` (`Console` is completed in the V-11 commit) | Operations 1, 2, 3 and 7: OK |
+| V-10 | `0170d28` | CategoryDiscount | `belongsToTargetCategory` replaced its three `instanceof` checks with `product.getCategory().equals(targetCategory)` | Operations 1, 2, 3 and 7: OK |
+| V-11 | `2faab25` | Product, Console | Added `isWarrantyEligible()` (false in `Product`, true in `Console`) and `Console.getCategory()` returning `CONSOLE`. Callers are changed by V-02, V-03 and V-21 | Operations 1, 2, 3 and 7: OK |
+| V-12 | `9c004d2` | Product, ProductService | Added `Product.increaseStock(int)`; `ProductService.restoreStock` calls it instead of `setStock(getStock() + quantity)` | Operations 1, 2, 3 and 7: OK |
+| V-13 | `c121391` | Accessory, Controller, Cable, Memory | Added abstract `getAccessoryType()` returning `CONTROLLER`, `CABLE` and `MEMORY` | Operations 1, 2, 3 and 7: OK |
+| V-14 | `752bca4` | Warranty, BasicWarranty, ExtendedWarranty | Added abstract `getTypeCode()` returning `BASIC` and `EXTENDED`; `getWarrantyType()` stays for the certificate | Operations 1, 2, 3 and 7: OK |
 
 ## Corrections
 

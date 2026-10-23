@@ -23,6 +23,11 @@ public class ExtendedWarranty extends Warranty {
     }
 
     @Override
+    public String getTypeCode() {
+        return "EXTENDED";
+    }
+
+    @Override
     public double getAdditionalCost() {
         if (getProduct() == null) {
             return 0.0;

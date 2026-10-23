@@ -40,6 +40,24 @@ public class Console extends Product {
     public String getGeneration() { return generation; }
     public void setGeneration(String generation) { this.generation = generation; }
 
+    /**
+     * @return "CONSOLE"
+     */
+    @Override
+    public String getCategory() {
+        return "CONSOLE";
+    }
+
+        /**
+     * Consoles receive the basic warranty and may get the extended one.
+     *
+     * @return true
+     */
+    @Override
+    public boolean isWarrantyEligible() {
+        return true;
+    }
+
     @Override
     public String getDescription() {
         return getTitle() + " [Console] - Brand: " + brand + ", Model: " + model + ", Generation: " + generation + ", Price: " + getPrice() + ", Stock: " + getStock();

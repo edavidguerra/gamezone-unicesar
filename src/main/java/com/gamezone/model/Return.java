@@ -86,11 +86,11 @@ public class Return {
      * consoles and recalculates the total refund.
      *
      * @param amount refundable warranty cost, must not be negative
-     * @throws IllegalArgumentException if the amount is negative
+     * @throws InvalidDataException if the amount is negative
      */
     public void addWarrantyRefund(double amount) {
         if (amount < 0) {
-            throw new IllegalArgumentException("El reembolso de garantia no puede ser negativo.");
+            throw new InvalidDataException("reembolso de garantia", "no puede ser negativo");
         }
         this.warrantyRefund += amount;
         calculateRefundAmount();

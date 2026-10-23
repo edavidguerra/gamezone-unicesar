@@ -10,6 +10,7 @@ import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
 import com.gamezone.persistence.FilePromotionRepository;
 import com.gamezone.persistence.PromotionRepository;
+import com.gamezone.persistence.FileReturnRepository;
 import com.gamezone.persistence.ReturnRepository;
 import com.gamezone.persistence.SaleRepository;
 import com.gamezone.persistence.FileWarrantyRepository;
@@ -55,7 +56,7 @@ public class Main {
             WarrantyService warrantyService = new WarrantyService(warrantyRepository, saleService, productService);
             saleService.setWarrantyService(warrantyService);
 
-                        ReturnRepository returnRepository = new ReturnRepository();
+                        ReturnRepository returnRepository = new FileReturnRepository();
             ReturnService returnService = new ReturnService(returnRepository, saleService, productService, accessoryService, warrantyService);
 
             ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService,

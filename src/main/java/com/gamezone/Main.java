@@ -4,6 +4,7 @@ import com.gamezone.exceptions.GameZoneException;
 import com.gamezone.persistence.AccessoryRepository;
 import com.gamezone.persistence.FileProductRepository;
 import com.gamezone.persistence.FileSaleRepository;
+import com.gamezone.persistence.FilePersonRepository;
 import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
 import com.gamezone.persistence.PromotionRepository;
@@ -35,7 +36,7 @@ public class Main {
     public static void main(String[] args) {
         try {
                         ProductRepository productRepository = new FileProductRepository();
-            PersonRepository personRepository = new PersonRepository();
+            PersonRepository personRepository = new FilePersonRepository();
             SaleRepository saleRepository = new FileSaleRepository();
             AccessoryRepository accessoryRepository = new AccessoryRepository();
             PromotionRepository promotionRepository = new PromotionRepository();

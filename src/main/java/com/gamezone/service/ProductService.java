@@ -11,7 +11,7 @@ import java.util.List;
  * items, listing the inventory and validating or updating stock.
  */
 
-public class ProductService {
+public class ProductService implements ProductLookup {
 
     private ProductRepository productRepository;
     private List<Product> products;
@@ -69,7 +69,7 @@ public class ProductService {
      * @param id product id
      * @return the product with the given id, or null if it does not exist
      */
-
+    @Override
     public Product findById(String id) {
         for (Product product : products) {
             if (product.getId().equals(id)) {

@@ -124,3 +124,41 @@ they receive (for example `SaleService` and `SaleRepository`).
 ## Dependency Inversion Principle (DIP)
 
 Owner: Developer 2.
+
+**What it says.** High-level modules should not depend on low-level modules; both should
+depend on abstractions. The business rules must not know the details of where or how the data
+is stored.
+
+**Where GameZone follows it.**
+
+- No service creates its own dependencies: `Main` builds the repositories and the services and
+  passes them through the constructors, so each service receives what it needs.
+- The `model` layer does not know `service` or `persistence`, and since the GRASP phase
+  `ReturnRepository` no longer imports any service (V-20), so dependencies only go downwards.
+- `PromotionService` and the sale logic work with the abstract `Promotion` and `Product`
+  types, not with each concrete subclass.
+
+**Violations.**
+
+- **V-50 to V-54** `PersonService`, `AccessoryService`, `PromotionService`, `ReturnService` and
+  `WarrantyService` each depend on the concrete class of their repository, which reads and
+  writes a text file. A change of storage, or a test with fake data, would mean editing the
+  service. The fix is the same for the five: the repository class becomes an interface with
+  its public methods (`PersonRepository`, `AccessoryRepository`, `PromotionRepository`,
+  `ReturnRepository`, `WarrantyRepository`), the current code moves to
+  `FilePersonRepository`, `FileAccessoryRepository`, `FilePromotionRepository`,
+  `FileReturnRepository` and `FileWarrantyRepository`, and `Main` is the only place that
+  creates them. The services keep receiving the repository through the constructor, now typed
+  as the interface. `WarrantyRecord` stays public so `WarrantyService` can still use it.
+- **V-55** `WarrantyService` and `ReturnService` receive the concrete `SaleService` (and
+  `WarrantyService` also `ProductService`) but only use lookups. The fix, shared with V-32
+  and V-44, is that `WarrantyService` depends on `SaleLookup` and `ProductLookup`, and
+  `ReturnService` depends on `SaleLookup`. `ReturnService` keeps the concrete `ProductService`
+  because it also lists products and restores stock. `Main` keeps passing the same objects.
+- **V-57** `PromotionRepository` checks the promotion type when it reads and writes the file.
+  It was rejected as an Open/Closed violation, so it is not a dependency problem: the
+  repository is the only class that knows the file format.
+
+The same change in the other scopes is made by the Technical Leader (`SaleRepository`, V-31)
+and by Developer 1 (`ProductRepository`, V-43), so every service ends up depending on an
+abstraction of its storage.

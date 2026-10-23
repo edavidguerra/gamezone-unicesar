@@ -3,7 +3,6 @@ package com.gamezone.service;
 import com.gamezone.exceptions.BusinessRuleException;
 import com.gamezone.exceptions.InvalidDataException;
 import com.gamezone.exceptions.ResourceNotFoundException;
-import com.gamezone.model.Accessory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -254,7 +253,7 @@ public class ReturnService {
      * ProductService for video games and consoles.
      */
     private void restoreItemStock(Product item) {
-        if (item instanceof Accessory) {
+        if ("ACCESSORY".equals(item.getCategory())) {
             accessoryService.restoreStock(item.getId(), 1);
         } else {
             productService.restoreStock(item.getId(), 1);

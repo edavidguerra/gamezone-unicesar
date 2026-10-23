@@ -1,7 +1,6 @@
 package com.gamezone.persistence;
 
 import com.gamezone.exceptions.PersistenceException;
-import com.gamezone.model.BasicWarranty;
 import com.gamezone.model.Warranty;
 
 import java.io.*;
@@ -60,7 +59,7 @@ public class WarrantyRepository {
     public void saveAll(List<Warranty> warranties) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (Warranty warranty : warranties) {
-                String type = (warranty instanceof BasicWarranty) ? "BASIC" : "EXTENDED";
+                String type = warranty.getTypeCode();
                 writer.println(type + "|" + warranty.getId() + "|"
                         + warranty.getProduct().getId() + "|" + warranty.getSale().getId()
                         + "|" + warranty.getStartDate());

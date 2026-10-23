@@ -1,90 +1,27 @@
 package com.gamezone.persistence;
-import com.gamezone.exceptions.PersistenceException;
-import com.gamezone.model.Console;
+
 import com.gamezone.model.Product;
-import com.gamezone.model.VideoGame;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+
 import java.util.List;
 
 /**
- * Handles reading and writing Product data (video games and consoles)
- * to a plain text file.
+ * Storage of video games and consoles. ProductService depends on this
+ * interface instead of a concrete file class, so the way products are
+ * stored can change without touching the catalog rules.
  */
-
-public class ProductRepository {
-
-    private static final String PRODUCTS_FILE = "data/products.csv";
+public interface ProductRepository {
 
     /**
-     * Saves the full list of products to disk, overwriting the file.
+     * Saves the full list of products, replacing what was stored before.
      *
      * @param products list of products to persist
      */
-
-    public void saveAll(List<Product> products) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCTS_FILE))) {
-            for (Product product : products) {
-                if (product instanceof VideoGame videoGame) {
-                    writer.println("VIDEOGAME|" + videoGame.getId() + "|" + videoGame.getTitle()
-                            + "|" + videoGame.getPrice() + "|" + videoGame.getStock()
-                            + "|" + videoGame.getPlatform() + "|" + videoGame.getGenre()
-                            + "|" + videoGame.getAgeRating());
-                } else if (product instanceof Console console) {
-                    writer.println("CONSOLE|" + console.getId() + "|" + console.getTitle()
-                            + "|" + console.getPrice() + "|" + console.getStock()
-                            + "|" + console.getBrand() + "|" + console.getModel()
-                            + "|" + console.getGeneration());
-                }
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo escribir el archivo " + PRODUCTS_FILE
-                    + " (operacion: guardado de productos): " + e.getMessage(), e);
-        }
-    }
+    void saveAll(List<Product> products);
 
     /**
-     * Loads all products from disk, rebuilding a VideoGame or a Console
-     * depending on the type marker stored in each line.
+     * Loads every stored product.
      *
-     * @return list of products loaded from disk
+     * @return list of products, empty if nothing has been stored yet
      */
-
-    public List<Product> loadAll() {
-        List<Product> products = new ArrayList<>();
-        File file = new File(PRODUCTS_FILE);
-        if (!file.exists()) {
-            return products;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                String[] parts = line.split("\\|");
-                String type = parts[0];
-
-                if (type.equals("VIDEOGAME")) {
-                    products.add(new VideoGame(parts[1], parts[2],
-                            Double.parseDouble(parts[3]), Integer.parseInt(parts[4]),
-                            parts[5], parts[6], parts[7]));
-                } else if (type.equals("CONSOLE")) {
-                    products.add(new Console(parts[1], parts[2],
-                            Double.parseDouble(parts[3]), Integer.parseInt(parts[4]),
-                            parts[5], parts[6], parts[7]));
-                }
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo leer el archivo " + PRODUCTS_FILE
-                    + " (operacion: carga de productos): " + e.getMessage(), e);
-        }
-        return products;
-    }
+    List<Product> loadAll();
 }

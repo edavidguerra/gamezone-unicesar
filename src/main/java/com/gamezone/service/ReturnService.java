@@ -3,8 +3,6 @@ package com.gamezone.service;
 import com.gamezone.exceptions.BusinessRuleException;
 import com.gamezone.exceptions.InvalidDataException;
 import com.gamezone.exceptions.ResourceNotFoundException;
-import com.gamezone.model.Accessory;
-import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -45,7 +43,9 @@ public class ReturnService {
         this.productService = productService;
         this.accessoryService = accessoryService;
         this.warrantyService = warrantyService;
-        this.returns = repository.loadAll();
+        List<Product> catalog = new ArrayList<>(productService.listProducts());
+        catalog.addAll(accessoryService.listAllAccessories());
+        this.returns = repository.loadAll(saleService.listSales(), catalog);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ReturnService {
 
         double warrantyRefund = 0.0;
         for (Product product : returnedProducts) {
-            if (product instanceof Console) {
+            if (product.isWarrantyEligible()) {
                 warrantyRefund += warrantyService.cancelWarranties(product.getId(), sale.getId());
             }
         }
@@ -253,7 +253,7 @@ public class ReturnService {
      * ProductService for video games and consoles.
      */
     private void restoreItemStock(Product item) {
-        if (item instanceof Accessory) {
+        if ("ACCESSORY".equals(item.getCategory())) {
             accessoryService.restoreStock(item.getId(), 1);
         } else {
             productService.restoreStock(item.getId(), 1);

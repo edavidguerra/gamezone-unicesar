@@ -1,5 +1,6 @@
 package com.gamezone.service;
 
+import com.gamezone.exceptions.InvalidDataException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
@@ -163,8 +164,29 @@ public class AccessoryService {
     public void restoreStock(String accessoryId, int quantity) {
         Accessory accessory = findById(accessoryId);
         if (accessory != null) {
-            accessory.setStock(accessory.getStock() + quantity);
+            accessory.increaseStock(quantity);
             repository.saveAll(accessories);
         }
+    }
+
+    /**
+     * Returns the accessories of the given type.
+     *
+     * @param type accessory type: CONTROLLER, CABLE or MEMORY
+     * @return list of accessories of that type
+     * @throws InvalidDataException if the type is not valid
+     */
+    public List<Accessory> listAccessoriesByType(String type) {
+        if (type == null || !(type.equalsIgnoreCase("CONTROLLER") || type.equalsIgnoreCase("CABLE")
+                || type.equalsIgnoreCase("MEMORY"))) {
+            throw new InvalidDataException("tipo", "debe ser CONTROLLER, CABLE o MEMORY");
+        }
+        List<Accessory> result = new ArrayList<>();
+        for (Accessory accessory : accessories) {
+            if (accessory.getAccessoryType().equalsIgnoreCase(type)) {
+                result.add(accessory);
+            }
+        }
+        return result;
     }
 }

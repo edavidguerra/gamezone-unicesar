@@ -48,6 +48,13 @@ One row per refactor commit, added in the same commit as the change.
 | V-12 | `9c004d2` | Product, ProductService | Added `Product.increaseStock(int)`; `ProductService.restoreStock` calls it instead of `setStock(getStock() + quantity)` | Operations 1, 2, 3 and 7: OK |
 | V-13 | `c121391` | Accessory, Controller, Cable, Memory | Added abstract `getAccessoryType()` returning `CONTROLLER`, `CABLE` and `MEMORY` | Operations 1, 2, 3 and 7: OK |
 | V-14 | `752bca4` | Warranty, BasicWarranty, ExtendedWarranty | Added abstract `getTypeCode()` returning `BASIC` and `EXTENDED`; `getWarrantyType()` stays for the certificate | Operations 1, 2, 3 and 7: OK |
+| V-20 | `7e896c5` | ReturnRepository, ReturnService, Main | `ReturnRepository` no longer imports the services: its constructor is empty and `loadAll(List<Sale>, List<Product>)` resolves sales and items from the lists it receives; `ReturnService` passes `listSales()` and the products plus accessories | Operations 1 to 10, list returns and register return with an unknown sale: OK |
+| V-21 | `20f7fa8` | ReturnService | `registerReturn` replaced `product instanceof Console` with `product.isWarrantyEligible()` and removed the unused `Console` import | Operations 1 to 10, list returns and list warranties: OK |
+| V-22 | `025232c` | ReturnService | `restoreItemStock` replaced `item instanceof Accessory` with `"ACCESSORY".equals(item.getCategory())` and removed the unused `Accessory` import | Operations 1 to 10 and register return: OK |
+| V-23 | `7b9c1b9` | AccessoryService | Added `listAccessoriesByType(String)`, which compares `getAccessoryType()` and throws `InvalidDataException` for an unknown type | Operations 1 to 10: OK |
+| V-24 | `474e7e0` | WarrantyRepository | `saveAll` replaced `instanceof BasicWarranty` with `warranty.getTypeCode()` and removed the unused import | Operations 1 to 10 and list warranties: OK |
+| V-25 | `021ff44` | AccessoryService | `restoreStock` calls `accessory.increaseStock(quantity)` instead of `setStock(getStock() + quantity)` | Operations 1 to 10 and register return: OK |
+| V-26 | - | WarrantyService | Deferred: `WarrantyService` will depend on `SaleLookup` and `ProductLookup` in the SOLID phase (V-55) | Not applicable |
 
 ## Corrections
 

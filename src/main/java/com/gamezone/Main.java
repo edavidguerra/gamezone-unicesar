@@ -2,6 +2,7 @@ package com.gamezone;
 
 import com.gamezone.exceptions.GameZoneException;
 import com.gamezone.persistence.AccessoryRepository;
+import com.gamezone.persistence.FileAccessoryRepository;
 import com.gamezone.persistence.FileProductRepository;
 import com.gamezone.persistence.FileSaleRepository;
 import com.gamezone.persistence.FilePersonRepository;
@@ -38,7 +39,7 @@ public class Main {
                         ProductRepository productRepository = new FileProductRepository();
             PersonRepository personRepository = new FilePersonRepository();
             SaleRepository saleRepository = new FileSaleRepository();
-            AccessoryRepository accessoryRepository = new AccessoryRepository();
+            AccessoryRepository accessoryRepository = new FileAccessoryRepository();
             PromotionRepository promotionRepository = new PromotionRepository();
             WarrantyRepository warrantyRepository = new WarrantyRepository();
 

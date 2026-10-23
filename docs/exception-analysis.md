@@ -101,3 +101,39 @@ Several design principles apply:
 In short, a custom hierarchy gives meaningful types, a single safe place to
 catch domain errors and a way to add new errors without touching working
 code. A generic `IllegalArgumentException` offers none of these.
+## Question 3: Where validators are invoked and layering
+
+Validators are invoked inside the service layer, right after the service
+retrieves the data it needs and right before it uses that data to build or
+change a domain object. In `SaleService.registerSale`, `personService` and
+`productService` first fetch `client`, `seller` and each `Product`/accessory
+(lines 58-59, 67, 75); only then are `PersonValidator.validatePersonExists`
+and `ProductValidator.validateProductExists`/`validateStockAvailability`
+called with those already-retrieved objects, and `SaleValidator.validateSaleData`
+is called right before the `Sale` object is created on line 83.
+
+This placement matches the dependency direction of the architecture:
+`ui -> service -> persistence -> model`, with `validation` sitting between
+`service` and `model`. Validators do not call `persistence` at all: they
+never open `PersonRepository`, `ProductRepository` or any file themselves.
+Instead, the service goes to persistence, gets the object, and only hands
+it to the validator afterward. This keeps the validator unaware of where
+the data came from, so it does not need to know whether the system reads
+from a CSV file, a database, or anything else; it only validates the object
+it receives.
+
+Validators could not live in `ConsoleMenu` either, because `ConsoleMenu`
+belongs to the ui layer, whose job is reading user input and printing
+output, not enforcing business rules. If a second interface were added
+later (for example a web interface), putting validation in `ConsoleMenu`
+would force that same logic to be duplicated in the new interface instead
+of being reused from a shared `service` layer, and a bug fixed in one place
+could easily be forgotten in the other.
+
+Finally, `SaleValidator.validateSaleData` is called before the `Sale`
+object is built (line 83) rather than after, following a fail-fast
+approach: if the data is invalid, the method stops immediately by throwing
+an exception, and no `Sale` object is ever created. If the validation
+happened after construction, an incomplete or invalid `Sale` would already
+exist in memory with no further use, since it could not be safely saved or
+processed.

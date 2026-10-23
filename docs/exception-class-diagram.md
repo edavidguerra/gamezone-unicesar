@@ -52,6 +52,7 @@ classDiagram
     SaleValidator ..> ResourceNotFoundException : throws
     SaleValidator ..> BusinessRuleException : throws
     SaleValidator ..> InvalidDataException : throws
+    Return ..> BusinessRuleException : throws
 ```
 ## Services and repositories integration
 

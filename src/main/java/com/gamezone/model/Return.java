@@ -1,5 +1,8 @@
 package com.gamezone.model;
 
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,27 +28,29 @@ public class Return {
      * @param originalSale     sale the returned products belong to
      * @param returnedProducts products being returned (may be a subset of the sale)
      * @param reason           reason given by the customer
-     * @throws IllegalArgumentException if any argument is missing or invalid
+     * @throws InvalidDataException  if the id, date, original sale or reason is missing,
+     *                               or if the list of returned products contains a null product
+     * @throws BusinessRuleException if no product is being returned
      */
     public Return(String id, LocalDate date, Sale originalSale,
                   List<Product> returnedProducts, String reason) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("El identificador de la devolucion es obligatorio.");
+            throw new InvalidDataException("identificador de la devolucion", "es obligatorio");
         }
         if (date == null) {
-            throw new IllegalArgumentException("La fecha de la devolucion es obligatoria.");
+            throw new InvalidDataException("fecha de la devolucion", "es obligatoria");
         }
         if (originalSale == null) {
-            throw new IllegalArgumentException("La devolucion debe referenciar una venta original.");
+            throw new InvalidDataException("venta original", "es obligatoria");
         }
         if (returnedProducts == null || returnedProducts.isEmpty()) {
-            throw new IllegalArgumentException("Debe devolver al menos un producto.");
+            throw new BusinessRuleException("Debe devolver al menos un producto.");
         }
         if (returnedProducts.contains(null)) {
-            throw new IllegalArgumentException("La lista de productos devueltos contiene un producto invalido.");
+            throw new InvalidDataException("productos devueltos", "contiene un producto nulo");
         }
         if (reason == null || reason.isBlank()) {
-            throw new IllegalArgumentException("El motivo de la devolucion es obligatorio.");
+            throw new InvalidDataException("motivo de la devolucion", "es obligatorio");
         }
         this.id = id;
         this.date = date;
@@ -81,11 +86,11 @@ public class Return {
      * consoles and recalculates the total refund.
      *
      * @param amount refundable warranty cost, must not be negative
-     * @throws IllegalArgumentException if the amount is negative
+     * @throws InvalidDataException if the amount is negative
      */
     public void addWarrantyRefund(double amount) {
         if (amount < 0) {
-            throw new IllegalArgumentException("El reembolso de garantia no puede ser negativo.");
+            throw new InvalidDataException("reembolso de garantia", "no puede ser negativo");
         }
         this.warrantyRefund += amount;
         calculateRefundAmount();

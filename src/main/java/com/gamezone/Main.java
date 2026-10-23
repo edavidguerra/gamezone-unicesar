@@ -2,13 +2,18 @@ package com.gamezone;
 
 import com.gamezone.exceptions.GameZoneException;
 import com.gamezone.persistence.AccessoryRepository;
+import com.gamezone.persistence.FileAccessoryRepository;
 import com.gamezone.persistence.FileProductRepository;
 import com.gamezone.persistence.FileSaleRepository;
+import com.gamezone.persistence.FilePersonRepository;
 import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
+import com.gamezone.persistence.FilePromotionRepository;
 import com.gamezone.persistence.PromotionRepository;
+import com.gamezone.persistence.FileReturnRepository;
 import com.gamezone.persistence.ReturnRepository;
 import com.gamezone.persistence.SaleRepository;
+import com.gamezone.persistence.FileWarrantyRepository;
 import com.gamezone.persistence.WarrantyRepository;
 import com.gamezone.service.AccessoryService;
 import com.gamezone.service.PersonService;
@@ -35,11 +40,11 @@ public class Main {
     public static void main(String[] args) {
         try {
                         ProductRepository productRepository = new FileProductRepository();
-            PersonRepository personRepository = new PersonRepository();
+            PersonRepository personRepository = new FilePersonRepository();
             SaleRepository saleRepository = new FileSaleRepository();
-            AccessoryRepository accessoryRepository = new AccessoryRepository();
-            PromotionRepository promotionRepository = new PromotionRepository();
-            WarrantyRepository warrantyRepository = new WarrantyRepository();
+            AccessoryRepository accessoryRepository = new FileAccessoryRepository();
+            PromotionRepository promotionRepository = new FilePromotionRepository();
+            WarrantyRepository warrantyRepository = new FileWarrantyRepository();
 
             ProductService productService = new ProductService(productRepository);
             PersonService personService = new PersonService(personRepository);
@@ -51,7 +56,7 @@ public class Main {
             WarrantyService warrantyService = new WarrantyService(warrantyRepository, saleService, productService);
             saleService.setWarrantyService(warrantyService);
 
-                        ReturnRepository returnRepository = new ReturnRepository();
+                        ReturnRepository returnRepository = new FileReturnRepository();
             ReturnService returnService = new ReturnService(returnRepository, saleService, productService, accessoryService, warrantyService);
 
             ConsoleMenu menu = new ConsoleMenu(productService, personService, saleService,

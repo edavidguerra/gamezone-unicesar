@@ -1,109 +1,40 @@
 package com.gamezone.persistence;
 
-import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Client;
 import com.gamezone.model.Seller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles reading and writing Client and Seller data to plain text
- * files.
+ * Storage of clients and sellers. Implementations decide where and how they are kept.
  */
-public class PersonRepository {
-    private static final String CLIENTS_FILE = "data/clients.csv";
-    private static final String SELLERS_FILE = "data/sellers.csv";
+public interface PersonRepository {
 
     /**
-     * Saves the full list of clients to disk, overwriting the file.
+     * Saves the full list of clients, replacing what was stored.
      *
      * @param clients list of clients to persist
      */
-    public void saveClients(List<Client> clients) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(CLIENTS_FILE))) {
-            for (Client client : clients) {
-                writer.println(client.getId() + "|" + client.getName() + "|"
-                        + client.getPhone() + "|" + client.getEmail());
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo escribir el archivo " + CLIENTS_FILE
-                    + " (operacion: guardado de clientes): " + e.getMessage(), e);
-        }
-    }
-        /**
-     * Loads all clients from disk.
+    void saveClients(List<Client> clients);
+
+    /**
+     * Loads all stored clients.
      *
-     * @return list of clients loaded from disk
+     * @return the stored clients, or an empty list if there are none
      */
-    public List<Client> loadClients() {
-        List<Client> clients = new ArrayList<>();
-        File file = new File(CLIENTS_FILE);
-        if (!file.exists()) {
-            return clients;
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                String[] parts = line.split("\\|");
-                clients.add(new Client(parts[0], parts[1], parts[2], parts[3]));
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo leer el archivo " + CLIENTS_FILE
-                    + " (operacion: carga de clientes): " + e.getMessage(), e);
-        }
-        return clients;
-    }
-        /**
-     * Saves the full list of sellers to disk, overwriting the file.
+    List<Client> loadClients();
+
+    /**
+     * Saves the full list of sellers, replacing what was stored.
      *
      * @param sellers list of sellers to persist
      */
-    public void saveSellers(List<Seller> sellers) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(SELLERS_FILE))) {
-            for (Seller seller : sellers) {
-                writer.println(seller.getId() + "|" + seller.getName() + "|"
-                        + seller.getPhone() + "|" + seller.getEmployeeCode() + "|"
-                        + seller.getShift());
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo escribir el archivo " + SELLERS_FILE
-                    + " (operacion: guardado de vendedores): " + e.getMessage(), e);
-        }
-    }
-        /**
-     * Loads all sellers from disk.
+    void saveSellers(List<Seller> sellers);
+
+    /**
+     * Loads all stored sellers.
      *
-     * @return list of sellers loaded from disk
+     * @return the stored sellers, or an empty list if there are none
      */
-    public List<Seller> loadSellers() {
-        List<Seller> sellers = new ArrayList<>();
-        File file = new File(SELLERS_FILE);
-        if (!file.exists()) {
-            return sellers;
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                String[] parts = line.split("\\|");
-                sellers.add(new Seller(parts[0], parts[1], parts[2], parts[3], parts[4]));
-            }
-        } catch (IOException e) {
-            throw new PersistenceException("No se pudo leer el archivo " + SELLERS_FILE
-                    + " (operacion: carga de vendedores): " + e.getMessage(), e);
-        }
-        return sellers;
-    }
+    List<Seller> loadSellers();
 }

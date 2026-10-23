@@ -1,11 +1,15 @@
 package com.gamezone.service;
 
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
 import com.gamezone.persistence.ReturnRepository;
+import com.gamezone.validation.SaleValidator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,33 +57,32 @@ public class ReturnService {
      * @param productIds identifiers of the products being returned
      * @param reason reason given by the customer
      * @return the registered return
-     * @throws IllegalArgumentException with a Spanish message if any validation fails
+     * @throws ResourceNotFoundException if the sale or a product does not exist
+     * @throws BusinessRuleException if the sale is outside the return window,
+     *         has no products to return, or a product has already been fully returned
      */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = saleService.findById(saleId);
-        if (sale == null) {
-            throw new IllegalArgumentException("La venta " + saleId + " no existe.");
-        }
+        SaleValidator.validateSaleExists(sale, saleId);
         if (!sale.canBeReturned()) {
-            throw new IllegalArgumentException(
+            throw new BusinessRuleException(
                     "La venta " + saleId + " supera los 30 dias permitidos para devolucion.");
         }
         if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException("Debe indicar al menos un producto a devolver.");
+            throw new BusinessRuleException("Debe indicar al menos un producto a devolver.");
         }
 
         List<Product> returnedProducts = new ArrayList<>();
         for (String productId : productIds) {
             Product product = findProductInSale(sale, productId);
             if (product == null) {
-                throw new IllegalArgumentException(
-                        "El producto " + productId + " no pertenece a la venta " + saleId + ".");
+                throw new ResourceNotFoundException("producto en la venta " + saleId, productId);
             }
             long available = countInSale(sale, productId)
                     - countAlreadyReturned(saleId, productId)
                     - countInList(returnedProducts, productId);
             if (available <= 0) {
-                throw new IllegalArgumentException(
+                throw new BusinessRuleException(
                         "El producto " + productId + " ya fue devuelto en su totalidad de la venta "
                         + saleId + ".");
             }
@@ -155,7 +158,7 @@ public class ReturnService {
      * @param month month of the year (1-12)
      * @param year four-digit year
      * @return net balance for the period
-     * @throws IllegalArgumentException if the month or year is invalid
+     * @throws InvalidDataException if the month or year is invalid
      */
     public double generateMonthlyBalance(int month, int year) {
         return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);
@@ -168,7 +171,7 @@ public class ReturnService {
      * @param month month of the year (1-12)
      * @param year  four-digit year
      * @return sum of the final totals of the sales made in that month
-     * @throws IllegalArgumentException if the month or year is invalid
+     * @throws InvalidDataException if the month or year is invalid
      */
     public double calculateMonthlySales(int month, int year) {
         validatePeriod(month, year);
@@ -184,10 +187,10 @@ public class ReturnService {
 
     private void validatePeriod(int month, int year) {
         if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+            throw new InvalidDataException("mes", "debe estar entre 1 y 12");
         }
         if (year < 1) {
-            throw new IllegalArgumentException("El anio debe ser un numero positivo.");
+            throw new InvalidDataException("anio", "debe ser positivo");
         }
     }
 
@@ -197,7 +200,7 @@ public class ReturnService {
      * @param month month of the year (1-12)
      * @param year  four-digit year
      * @return sum of the amounts refunded in that month
-     * @throws IllegalArgumentException if the month or year is invalid
+     * @throws InvalidDataException if the month or year is invalid
      */
     public double calculateMonthlyReturns(int month, int year) {
         validatePeriod(month, year);

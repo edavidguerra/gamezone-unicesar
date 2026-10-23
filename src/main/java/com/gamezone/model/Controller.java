@@ -22,6 +22,14 @@ public class Controller extends Accessory {
         this.connectionType = connectionType;
     }
 
+    /**
+     * @return "CONTROLLER"
+     */
+    @Override
+    public String getAccessoryType() {
+        return "CONTROLLER";
+    }
+
     @Override
     public String getDescription() {
         return getTitle() + " [Controller] - Price: " + getPrice()

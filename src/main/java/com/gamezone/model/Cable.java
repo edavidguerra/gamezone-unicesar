@@ -32,6 +32,14 @@ public class Cable extends Accessory {
         this.connectorType = connectorType;
     }
 
+    /**
+     * @return "CABLE"
+     */
+    @Override
+    public String getAccessoryType() {
+        return "CABLE";
+    }
+
     @Override
     public String getDescription() {
         return getTitle() + " [Cable] - Price: " + getPrice()

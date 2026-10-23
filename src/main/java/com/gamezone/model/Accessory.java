@@ -51,6 +51,14 @@ public abstract class Accessory extends Product {
         return "ACCESSORY";
     }
 
+    /**
+     * Returns the type code of the accessory, the same token used in the
+     * accessories file.
+     *
+     * @return "CONTROLLER", "CABLE" or "MEMORY"
+     */
+    public abstract String getAccessoryType();
+
     @Override
     public String getDescription() {
         return getTitle() + " [Accessory] - Price: " + getPrice()

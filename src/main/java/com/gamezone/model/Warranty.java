@@ -14,14 +14,12 @@ public abstract class Warranty {
     private Product product;
     private Sale sale;
     private LocalDate startDate;
-    private LocalDate endDate;
 
     public Warranty(String id, Product product, Sale sale, LocalDate startDate) {
         this.id = id;
         this.product = product;
         this.sale = sale;
         this.startDate = startDate;
-        this.endDate = startDate.plusMonths(getDurationInMonths());
     }
 
     public String getId() { return id; }
@@ -36,11 +34,18 @@ public abstract class Warranty {
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    /**
+     * Computes the end date from the start date and the duration of the
+     * warranty type, so it always matches the current start date.
+     *
+     * @return the last day the warranty is valid
+     */
+    public LocalDate getEndDate() {
+        return startDate.plusMonths(getDurationInMonths());
+    }
 
     public boolean isActive(LocalDate date) {
-        return !date.isBefore(startDate) && !date.isAfter(endDate);
+        return !date.isBefore(startDate) && !date.isAfter(getEndDate());
     }
 
     public abstract int getDurationInMonths();
@@ -63,6 +68,6 @@ public abstract class Warranty {
         return "Certificado de garantia " + id + "\n"
              + "Tipo: " + getWarrantyType() + "\n"
              + "Producto: " + product.getTitle() + "\n"
-             + "Vigencia: " + startDate + " a " + endDate;
+             + "Vigencia: " + startDate + " a " + getEndDate();
     }
 }

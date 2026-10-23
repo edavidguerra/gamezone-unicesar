@@ -1,5 +1,7 @@
 package com.gamezone.model;
 
+import com.gamezone.exceptions.BusinessRuleException;
+
 import java.util.List;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -29,10 +31,11 @@ public class Sale {
      * @param client   client who made the purchase
      * @param seller   seller who attended the sale
      * @param products list of products sold, must contain at least one item
+     * @throws BusinessRuleException if the list of products is empty
      */
     public Sale(String id, String date, Client client, Seller seller, List<Product> products) {
         if (products == null || products.isEmpty()) {
-            throw new IllegalArgumentException("A sale must contain at least one product.");
+            throw new BusinessRuleException("Una venta debe contener al menos un producto.");
         }
         this.id = id;
         this.date = date;

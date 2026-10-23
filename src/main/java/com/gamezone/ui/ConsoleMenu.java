@@ -1,5 +1,10 @@
 package com.gamezone.ui;
 
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.GameZoneException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.PersistenceException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.BulkPurchaseDiscount;
 import com.gamezone.model.Cable;
@@ -25,6 +30,7 @@ import com.gamezone.service.SaleService;
 import com.gamezone.service.WarrantyService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -500,6 +506,33 @@ public class ConsoleMenu {
             System.out.println("Balance neto del mes (ventas - devoluciones): " + balance);
         } catch (NumberFormatException e) {
             System.out.println("Valor invalido. Debe ingresar numeros enteros.");
+        }
+    }
+
+    /**
+     * Runs one menu operation and translates every failure into a Spanish
+     * message, so that an error never stops the application. The catch
+     * blocks go from the most specific exception to the most general one.
+     *
+     * @param operation the menu operation to run
+     */
+    private void execute(Runnable operation) {
+        try {
+            operation.run();
+        } catch (ResourceNotFoundException e) {
+            System.out.println("[No encontrado] " + e.getMessage());
+        } catch (BusinessRuleException e) {
+            System.out.println("[Operacion no permitida] " + e.getMessage());
+        } catch (InvalidDataException e) {
+            System.out.println("[Dato invalido] " + e.getMessage());
+        } catch (PersistenceException e) {
+            System.out.println("[Error de almacenamiento] " + e.getMessage());
+        } catch (GameZoneException e) {
+            System.out.println("[Error] " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("[Dato invalido] Debe ingresar un numero valido.");
+        } catch (DateTimeParseException e) {
+            System.out.println("[Dato invalido] La fecha debe tener el formato AAAA-MM-DD.");
         }
     }
 

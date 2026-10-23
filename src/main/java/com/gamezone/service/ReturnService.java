@@ -20,7 +20,7 @@ import java.util.List;
 public class ReturnService {
 
     private final ReturnRepository repository;
-    private final SaleService saleService;
+    private final SaleLookup saleLookup;
     private final ProductService productService;
     private final AccessoryService accessoryService;
     private final WarrantyService warrantyService;
@@ -30,22 +30,22 @@ public class ReturnService {
      * Creates the service and loads the persisted returns.
      *
      * @param repository       persistence of returns
-     * @param saleService      service used to find and list sales
+     * @param saleLookup       lookup used to find and list sales
      * @param productService   service used to restore product stock
      * @param accessoryService service used to restore accessory stock
      * @param warrantyService  service used to cancel the warranties of returned consoles
      */
-    public ReturnService(ReturnRepository repository, SaleService saleService,
+    public ReturnService(ReturnRepository repository, SaleLookup saleLookup,
             ProductService productService, AccessoryService accessoryService,
             WarrantyService warrantyService) {
         this.repository = repository;
-        this.saleService = saleService;
+        this.saleLookup = saleLookup;
         this.productService = productService;
         this.accessoryService = accessoryService;
         this.warrantyService = warrantyService;
         List<Product> catalog = new ArrayList<>(productService.listProducts());
         catalog.addAll(accessoryService.listAllAccessories());
-        this.returns = repository.loadAll(saleService.listSales(), catalog);
+        this.returns = repository.loadAll(saleLookup.listSales(), catalog);
     }
 
     /**
@@ -62,7 +62,7 @@ public class ReturnService {
      *         has no products to return, or a product has already been fully returned
      */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
-        Sale sale = saleService.findById(saleId);
+        Sale sale = saleLookup.findById(saleId);
         SaleValidator.validateSaleExists(sale, saleId);
         if (!sale.canBeReturned()) {
             throw new BusinessRuleException(
@@ -176,7 +176,7 @@ public class ReturnService {
     public double calculateMonthlySales(int month, int year) {
         validatePeriod(month, year);
         double total = 0.0;
-        for (Sale sale : saleService.listSales()) {
+        for (Sale sale : saleLookup.listSales()) {
             LocalDate saleDate = LocalDate.parse(sale.getDate());
             if (saleDate.getMonthValue() == month && saleDate.getYear() == year) {
                 total += sale.getFinalTotal();

@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.BulkPurchaseDiscount;
 import com.gamezone.model.CategoryDiscount;
 import com.gamezone.model.PercentageDiscount;
@@ -24,7 +25,8 @@ public class PromotionRepository {
                 writer.println(toLine(promotion));
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar promociones: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + FILE_PATH
+                    + " (operacion: guardado de promociones): " + e.getMessage(), e);
         }
     }
 
@@ -41,7 +43,8 @@ public class PromotionRepository {
                 promotions.add(fromLine(line));
             }
         } catch (IOException e) {
-            System.out.println("Error al leer promociones: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + FILE_PATH
+                    + " (operacion: carga de promociones): " + e.getMessage(), e);
         }
         return promotions;
     }
@@ -74,7 +77,8 @@ public class PromotionRepository {
                     Double.parseDouble(parts[5]), parts[6]);
             case "BULK" -> new BulkPurchaseDiscount(id, name, startDate, endDate,
                     Integer.parseInt(parts[5]), Double.parseDouble(parts[6]));
-            default -> throw new IllegalArgumentException("Unknown promotion type: " + type);
+            default -> throw new PersistenceException("Tipo de promocion desconocido en "
+                    + FILE_PATH + ": " + type, null);
         };
     }
 }

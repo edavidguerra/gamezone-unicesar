@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
@@ -39,7 +40,8 @@ public class AccessoryRepository {
                 writer.println(toLine(accessory));
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar accesorios: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + FILE_PATH
+                    + " (operacion: guardado de accesorios): " + e.getMessage(), e);
         }
     }
 
@@ -64,7 +66,8 @@ public class AccessoryRepository {
                 accessories.add(fromLine(line));
             }
         } catch (IOException e) {
-            System.out.println("Error al leer accesorios: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + FILE_PATH
+                    + " (operacion: carga de accesorios): " + e.getMessage(), e);
         }
         return accessories;
     }
@@ -133,7 +136,8 @@ public class AccessoryRepository {
                         Integer.parseInt(parts[5]), parts[6]);
                 consoleIdsField = parts[7];
             }
-            default -> throw new IllegalArgumentException("Unknown accessory type: " + type);
+            default -> throw new PersistenceException("Tipo de accesorio desconocido en "
+                    + FILE_PATH + ": " + type, null);
         }
 
         if (!consoleIdsField.isBlank()) {

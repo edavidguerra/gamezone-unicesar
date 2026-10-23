@@ -1,5 +1,6 @@
 package com.gamezone.persistence;
 
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.BasicWarranty;
 import com.gamezone.model.Warranty;
 
@@ -21,7 +22,39 @@ public class WarrantyRepository {
      * Simple record-like holder for a raw, unresolved warranty line.
      */
     public static class WarrantyRecord {
-        public String type, id, productId, saleId, startDate;
+        private final String type;
+        private final String id;
+        private final String productId;
+        private final String saleId;
+        private final String startDate;
+
+        public WarrantyRecord(String type, String id, String productId, String saleId, String startDate) {
+            this.type = type;
+            this.id = id;
+            this.productId = productId;
+            this.saleId = saleId;
+            this.startDate = startDate;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getProductId() {
+            return productId;
+        }
+
+        public String getSaleId() {
+            return saleId;
+        }
+
+        public String getStartDate() {
+            return startDate;
+        }
     }
 
     public void saveAll(List<Warranty> warranties) {
@@ -33,7 +66,8 @@ public class WarrantyRepository {
                         + "|" + warranty.getStartDate());
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar garantias: " + e.getMessage());
+            throw new PersistenceException("No se pudo escribir el archivo " + FILE_PATH
+                    + " (operacion: guardado de garantias): " + e.getMessage(), e);
         }
     }
 
@@ -48,16 +82,11 @@ public class WarrantyRepository {
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
                 String[] parts = line.split("\\|", -1);
-                WarrantyRecord record = new WarrantyRecord();
-                record.type = parts[0];
-                record.id = parts[1];
-                record.productId = parts[2];
-                record.saleId = parts[3];
-                record.startDate = parts[4];
-                records.add(record);
+                records.add(new WarrantyRecord(parts[0], parts[1], parts[2], parts[3], parts[4]));
             }
         } catch (IOException e) {
-            System.out.println("Error al leer garantias: " + e.getMessage());
+            throw new PersistenceException("No se pudo leer el archivo " + FILE_PATH
+                    + " (operacion: carga de garantias): " + e.getMessage(), e);
         }
         return records;
     }

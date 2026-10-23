@@ -32,13 +32,13 @@ public class WarrantyService {
     private List<Warranty> resolveRecords(List<WarrantyRecord> records) {
         List<Warranty> resolved = new ArrayList<>();
         for (WarrantyRecord record : records) {
-            Product product = productService.findById(record.productId);
-            Sale sale = saleService.findById(record.saleId);
-            LocalDate startDate = LocalDate.parse(record.startDate);
+            Product product = productService.findById(record.getProductId());
+            Sale sale = saleService.findById(record.getSaleId());
+            LocalDate startDate = LocalDate.parse(record.getStartDate());
 
-            Warranty warranty = record.type.equals("BASIC")
-                    ? new BasicWarranty(record.id, product, sale, startDate)
-                    : new ExtendedWarranty(record.id, product, sale, startDate);
+            Warranty warranty = record.getType().equals("BASIC")
+                    ? new BasicWarranty(record.getId(), product, sale, startDate)
+                    : new ExtendedWarranty(record.getId(), product, sale, startDate);
             resolved.add(warranty);
         }
         return resolved;

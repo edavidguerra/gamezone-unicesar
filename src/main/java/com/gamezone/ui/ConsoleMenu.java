@@ -100,9 +100,9 @@ public class ConsoleMenu {
         System.out.println("3. List products");
         System.out.print("Choose an option: ");
         switch (readInt()) {
-            case 1 -> registerVideoGame();
-            case 2 -> registerConsole();
-            case 3 -> listProducts();
+            case 1 -> execute(this::registerVideoGame);
+            case 2 -> execute(this::registerConsole);
+            case 3 -> execute(this::listProducts);
             default -> System.out.println("Invalid option.");
         }
     }
@@ -144,9 +144,9 @@ public class ConsoleMenu {
         System.out.println("3. List sellers");
         System.out.print("Choose an option: ");
         switch (readInt()) {
-            case 1 -> registerClient();
-            case 2 -> listClients();
-            case 3 -> listSellers();
+            case 1 -> execute(this::registerClient);
+            case 2 -> execute(this::listClients);
+            case 3 -> execute(this::listSellers);
             default -> System.out.println("Invalid option.");
         }
     }

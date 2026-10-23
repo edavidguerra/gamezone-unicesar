@@ -26,9 +26,45 @@ Each section answers three questions:
 
 Owner: Developer 1.
 
+**What it says.** Assign a responsibility to the class that has the information needed to
+fulfill it.
+
+**Where GameZone applies it.**
+
+- `Product.hasStock` and `Product.reduceStock` work on the `stock` the product owns.
+- `Return.calculateRefundAmount` computes the refund from the original sale and the returned
+  items it holds, using `getDiscountRate` and `calculateItemRefund`.
+- Each `Promotion` subclass computes its own discount in `calculateDiscount(Sale)`, because the
+  percentage, the target category or the minimum quantity are its own attributes.
+
+**Violations.**
+
+- **V-12** `ProductService.restoreStock` did the stock arithmetic itself with
+  `product.setStock(product.getStock() + quantity)`, although `Product` owns `stock` and already
+  knew how to lower it. Fix: `Product.increaseStock(int quantity)`, and the service only calls
+  `product.increaseStock(quantity)`. Developer 2 applies the same method in
+  `AccessoryService.restoreStock` (V-25).
+
 ## Creator
 
 Owner: Developer 1.
+
+**What it says.** Class B should create objects of class A when B contains or aggregates A, or
+when B has the data needed to initialize A.
+
+**Where GameZone applies it.**
+
+- `ProductService.registerVideoGame` and `registerConsole` create the products after
+  validating the data, and they keep the list that contains them.
+- `PromotionService` creates the three kinds of discount, and `WarrantyService` creates
+  `BasicWarranty` and `ExtendedWarranty` because it receives the product and the sale they need.
+- `ReturnService.registerReturn` creates the `Return` only after it has resolved the sale and
+  every returned product.
+- Each repository creates objects only while reading its file, because it is the only class
+  that has the saved data.
+
+**Violations.** None found. Every object in this scope is created by the class that has its
+initializing data and keeps it in a list.
 
 ## Controller
 
@@ -84,6 +120,36 @@ Owner: Developer 2.
 ## Polymorphism
 
 Owner: Developer 1.
+
+**What it says.** When behavior changes with the type of an object, give that behavior to the
+type through a polymorphic method instead of asking for the class with `instanceof` or a
+`switch`.
+
+**Where GameZone applies it.**
+
+- `Product.getDescription` is abstract and every product and accessory builds its own text.
+- `Promotion.calculateDiscount` is abstract and each discount applies its own rule.
+- `Warranty.getDurationInMonths` and `getAdditionalCost` let the constructor compute the end
+  date without knowing which warranty it is.
+
+**Violations.**
+
+- **V-10** `CategoryDiscount.belongsToTargetCategory` used `instanceof VideoGame`, `Console`
+  and `Accessory`. Fix: abstract `getCategory()` in `Product`, and the method became
+  `return targetCategory.equals(product.getCategory());`.
+- **V-11** Three classes used `instanceof Console` to know whether a product has a warranty.
+  Fix: `isWarrantyEligible()` in `Product` (returns `false`) overridden in `Console` (returns
+  `true`). The callers are fixed in V-02, V-03 and V-21.
+- **V-13** An accessory could not say its type, so the menu tested `instanceof Controller`,
+  `Cable` and `Memory`. Fix: abstract `getAccessoryType()` in `Accessory`, which returns the
+  same tokens `AccessoryRepository` writes; Developer 2 uses it in V-23.
+- **V-14** `Warranty` only had `getWarrantyType()`, which returns text for the user, so
+  `WarrantyRepository` tested `instanceof BasicWarranty` to write the file. Fix: abstract
+  `getTypeCode()` returning `"BASIC"` or `"EXTENDED"`; Developer 2 uses it in V-24.
+
+`ProductRepository` still checks the product type when it reads and writes the file (V-15). It
+was rejected as a violation because that mapping belongs to the repository, a Pure
+Fabrication, and moving it to the model would make the model depend on the file format.
 
 ## Pure Fabrication
 

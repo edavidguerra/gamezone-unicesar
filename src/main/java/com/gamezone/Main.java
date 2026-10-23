@@ -8,6 +8,7 @@ import com.gamezone.persistence.FileSaleRepository;
 import com.gamezone.persistence.FilePersonRepository;
 import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
+import com.gamezone.persistence.FilePromotionRepository;
 import com.gamezone.persistence.PromotionRepository;
 import com.gamezone.persistence.ReturnRepository;
 import com.gamezone.persistence.SaleRepository;
@@ -41,7 +42,7 @@ public class Main {
             PersonRepository personRepository = new FilePersonRepository();
             SaleRepository saleRepository = new FileSaleRepository();
             AccessoryRepository accessoryRepository = new FileAccessoryRepository();
-            PromotionRepository promotionRepository = new PromotionRepository();
+            PromotionRepository promotionRepository = new FilePromotionRepository();
             WarrantyRepository warrantyRepository = new FileWarrantyRepository();
 
             ProductService productService = new ProductService(productRepository);

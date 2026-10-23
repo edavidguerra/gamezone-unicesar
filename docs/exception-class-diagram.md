@@ -89,4 +89,14 @@ classDiagram
     ProductRepository ..> PersistenceException : throws on IOException
     PersonRepository ..> PersistenceException : throws on IOException
     SaleRepository ..> PersistenceException : throws on IOException
+    class ConsoleMenu {
+        -execute(Runnable operation)
+    }
+    class Main
+    ConsoleMenu ..> ResourceNotFoundException : catches
+    ConsoleMenu ..> BusinessRuleException : catches
+    ConsoleMenu ..> InvalidDataException : catches
+    ConsoleMenu ..> PersistenceException : catches
+    ConsoleMenu ..> GameZoneException : catches
+    Main ..> GameZoneException : catches on start-up
 ```

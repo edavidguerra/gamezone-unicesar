@@ -70,4 +70,13 @@ this.stock = this.stock - quantity;
      */
 
 public abstract String getDescription();
+
+/**
+     * Returns the category code of the product, used by promotions that
+     * apply only to one kind of product.
+     *
+     * @return "VIDEOGAME", "CONSOLE" or "ACCESSORY"
+     */
+
+public abstract String getCategory();
 }

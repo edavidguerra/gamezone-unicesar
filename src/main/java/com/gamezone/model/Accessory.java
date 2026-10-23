@@ -41,6 +41,16 @@ public abstract class Accessory extends Product {
         return this.compatibleConsoleIds.contains(consoleId);
     }
 
+    /**
+     * Every accessory shares the same category, whatever its type.
+     *
+     * @return "ACCESSORY"
+     */
+    @Override
+    public String getCategory() {
+        return "ACCESSORY";
+    }
+
     @Override
     public String getDescription() {
         return getTitle() + " [Accessory] - Price: " + getPrice()

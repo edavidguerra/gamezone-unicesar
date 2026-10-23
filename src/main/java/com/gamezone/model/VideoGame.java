@@ -39,6 +39,14 @@ public void setGenre(String genre) { this.genre = genre; }
 public String getAgeRating() { return ageRating; }
 public void setAgeRating(String ageRating) { this.ageRating = ageRating; }
 
+/**
+     * @return "VIDEOGAME"
+     */
+@Override
+public String getCategory() {
+return "VIDEOGAME";
+}
+
 @Override
 public String getDescription() {
 return getTitle() + " [Video game] - Platform: " + platform
